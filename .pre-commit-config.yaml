@@ -1,0 +1,61 @@
+fail_fast: true
+
+repos:
+   # checks for secrets via rules (gitleaks.toml)
+  - repo: https://github.com/zricethezav/gitleaks
+    rev: v8.16.3
+    hooks:
+      - id: gitleaks
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.0.270
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+  # - repo: https://github.com/ambv/black
+  #   rev: 23.1.0
+  #   hooks:
+  #   - id: black
+  # - repo: https://github.com/PyCQA/flake8
+  #   rev: 6.0.0
+  #   hooks:
+  #   - id: flake8
+  # - repo: https://github.com/timothycrosley/isort
+  #   rev: 5.10.1
+  #   hooks:
+  #   - id: isort
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+    - id: check-yaml
+    - id: check-added-large-files
+      args: ['--maxkb=1024']
+    - id: check-docstring-first
+      exclude: |
+          (?x)^(
+              hello.py
+          )$
+    - id: check-executables-have-shebangs
+    - id: check-merge-conflict
+    - id: check-shebang-scripts-are-executable
+    - id: check-symlinks
+    - id: check-toml
+    - id: check-yaml
+      args: [--unsafe]
+    - id: debug-statements
+    - id: destroyed-symlinks
+    - id: detect-private-key
+    - id: end-of-file-fixer
+    - id: fix-byte-order-marker
+    - id: mixed-line-ending
+    - id: pretty-format-json
+      # https://pre-commit.com/#regular-expressions
+      exclude: |
+          (?x)^(
+              .devcontainer/devcontainer.json|
+              .vscode/launch.json|
+              .vscode/settings.json
+          )$
+      args: ['--autofix', '--indent=2', '--no-sort-keys']
+    - id: requirements-txt-fixer
+    # - id: trailing-whitespace
