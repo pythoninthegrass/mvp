@@ -1,0 +1,231 @@
+#cloud-config
+
+output: {all: '| tee -a /var/log/cloud-init.log'}   # store logs inside vm
+
+timezone: "America/Chicago"
+
+hostname: ubuntu
+
+package_update: true
+package_upgrade: true
+apt_get_command: ["apt-get", "--option=Dpkg::Options::=--force-confold", "--option=Dpkg::options::=--force-unsafe-io", "--assume-yes", "--quiet", "--no-install-recommends"]
+
+apt:
+  sources:
+    deadsnakes.list:
+      source: deb http://ppa.launchpad.net/deadsnakes/ppa/ubuntu $RELEASE main
+      keyid: F23C5A6CF475977595C89F51BA6932366A755776
+    docker.list:
+      source: deb https://download.docker.com/linux/ubuntu $RELEASE stable
+      keyid: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+
+packages:
+  - ansible
+  - ansible-lint
+  - apt-transport-https
+  - ca-certificates
+  - cloud-init
+  - containerd.io
+  - curl
+  - dnsutils
+  - docker-ce
+  - docker-ce-cli
+  - git
+  - gnupg-agent
+  - inxi
+  - make
+  - net-tools
+  - p7zip-full
+  - python3.11
+  - python3.11-venv
+  - software-properties-common
+  - tldr
+  - tree
+  - vim
+  - wget
+
+groups:
+  - docker
+
+system_info:
+  default_user:
+    groups: [docker]
+
+users:
+  - name: ubuntu
+    shell: /bin/bash
+    groups: [admin, users, wheel]
+    ssh_import_id: None
+    lock_passwd: true
+    sudo: ALL=(ALL) NOPASSWD:ALL
+
+  - name: ansible
+    shell: /bin/bash
+    groups: [admin, users, wheel]
+    ssh_import_id: None
+    lock_passwd: true
+    sudo: ALL=(ALL) NOPASSWD:ALL
+
+runcmd:
+  - curl -s https://github.com/pythoninthegrass.keys >> /home/ubuntu/.ssh/authorized_keys
+  - git clone https://github.com/pythoninthegrass/mvp.git /home/ubuntu/git/mvp
+  - chown -R ubuntu:ubuntu /home/ubuntu/git/mvp
+  - touch /var/log/ansible.log
+  - runuser -l ansible -c "sudo chown ansible:ansible /var/log/ansible.log"
+  - runuser -l ansible -c "sudo chmod 0777 /var/log/ansible.log"
+
+write_files:
+  - path: /home/ubuntu/.bashrc
+    owner: ubuntu:ubuntu
+    permissions: '0644'
+    defer: true
+    append: false
+    content: |
+      # Verify that shell is interactive
+      if [[ $- != *i* ]]; then return; fi
+
+      alias update='sudo apt update && sudo apt upgrade -y && sudo apt dist-upgrade -y && sudo apt autoremove -y && sudo apt auto-clean'
+      alias python='python3.11'
+      alias ll='ls -FGlAhp'
+      alias mkdir='mkdir -pv'
+      alias ..='cd ../'
+      alias ...='cd ../../'
+      cd() { builtin cd "$@"; ll; }
+
+      HISTCONTROL=ignoreboth
+      shopt -s histappend
+      HISTSIZE=1000
+      HISTFILESIZE=2000
+
+      # Forward search in bash (step forward via ctrl-s)
+      stty -ixon
+
+      shopt -s checkwinsize
+
+      if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+          debian_chroot=$(cat /etc/debian_chroot)
+      fi
+
+      case "$TERM" in
+        xterm-color|*-256color) color_prompt=yes;;
+      esac
+
+      if [ "$color_prompt" = yes ]; then
+          PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] \nλ '
+      else
+          PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w \nλ '
+      fi
+      unset color_prompt force_color_prompt
+
+      case "$TERM" in
+      xterm*|rxvt*)
+          PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+          ;;
+      *)
+          ;;
+      esac
+
+  - path: /home/ubuntu/.bash_profile
+    owner: ubuntu:ubuntu
+    defer: true
+    content: |
+      [[ -s ~/.bashrc ]] && source ~/.bashrc
+
+  - path: /home/ubuntu/.gitignore
+    owner: ubuntu:ubuntu
+    defer: true
+    content: |
+      .env
+      .gitattributes
+      .venv
+      *.bak
+      **/scratch*
+      creds/
+      service_account.json
+      settings.ini
+
+  - path: /home/ubuntu/.gitconfig
+    owner: ubuntu:ubuntu
+    defer: true
+    content: |
+      [core]
+        excludesfile = /home/ubuntu/.gitignore
+      [user]
+        email = 4097471+pythoninthegrass@users.noreply.github.com
+        name = pythoninthegrass
+      [pull]
+        rebase = true
+
+  - path: /etc/ansible/hosts
+    owner: ansible:ansible
+    defer: true
+    content: |
+      [all]
+      localhost ansible_connection=local
+
+      [all:vars]
+      ansible_user=ansible
+      ansible_become=yes
+      ansible_become_method=sudo
+      ansible_python_interpreter=/usr/bin/python3
+
+  - path: /etc/ansible/ansible.cfg
+    owner: ansible:ansible
+    defer: true
+    content: |
+      [defaults]
+      log_path                    = /var/log/ansible.log
+      host_key_checking           = False
+      retry_files_enabled          = False
+      remote_tmp                  = /tmp/${USER}/ansible
+      gathering                   = smart
+      fact_caching                = jsonfile
+      fact_caching_connection     = /tmp/${USER}/facts
+
+  - path: /etc/netplan/50-cloud-init.yaml
+    owner: root:root
+    permissions: '0644'
+    append: false
+    content: |
+      network:
+        version: 2
+        ethernets:
+          ens3:
+            dhcp4: true
+            match:
+              name: en*s3
+            set-name: ens3
+            nameservers:
+              addresses: [1.1.1.1, 1.0.0.1]
+
+  - path: /etc/systemd/system/docker.service.d/override.conf
+    content: |
+      # Disable flags to dockerd, all settings are done in /etc/docker/daemon.json
+      [Service]
+      ExecStart=
+      ExecStart=/usr/bin/dockerd
+
+  - path: /etc/sysctl.d/enabled_ipv4_forwarding.conf
+    content: |
+      net.ipv4.conf.all.forwarding=1
+
+  - path: /etc/docker/daemon.json
+    content: |
+      {
+        "dns": [
+          "1.1.1.1",
+          "1.0.0.1"
+        ],
+        "hosts": ["tcp://0.0.0.0:2375", "unix:///var/run/docker.sock"]
+      }
+
+bootcmd:
+  - printf "[Resolve]\nDNS=1.1.1.1" > /etc/systemd/resolved.conf
+  - printf "\nDNS=1.0.0.1" >> /etc/systemd/resolved.conf
+  - systemctl restart systemd-resolved
+
+final_message: "The system is finally up, after $UPTIME seconds"
+
+# power_state:
+#   timeout: 300
+#   mode: reboot

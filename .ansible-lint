@@ -1,0 +1,15 @@
+---
+profile: min # null, min, basic, moderate,safety, shared, production
+exclude_paths:
+  - .git/
+  - .github/
+  - .vscode/
+enable_list:
+  - fqcn-builtins  # opt-in
+warn_list:
+  - line-length
+  - yaml[line-length]
+skip_list:
+  - name
+  - risky-file-permissions
+offline: true

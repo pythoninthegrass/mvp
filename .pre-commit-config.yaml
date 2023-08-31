@@ -1,14 +1,8 @@
 fail_fast: true
 
 repos:
-   # checks for secrets via rules (gitleaks.toml)
-  - repo: https://github.com/zricethezav/gitleaks
-    rev: v8.16.3
-    hooks:
-      - id: gitleaks
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Ruff version.
-    rev: v0.0.270
+    rev: v0.0.286
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
@@ -16,14 +10,6 @@ repos:
   #   rev: 23.1.0
   #   hooks:
   #   - id: black
-  # - repo: https://github.com/PyCQA/flake8
-  #   rev: 6.0.0
-  #   hooks:
-  #   - id: flake8
-  # - repo: https://github.com/timothycrosley/isort
-  #   rev: 5.10.1
-  #   hooks:
-  #   - id: isort
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
@@ -58,4 +44,3 @@ repos:
           )$
       args: ['--autofix', '--indent=2', '--no-sort-keys']
     - id: requirements-txt-fixer
-    # - id: trailing-whitespace
