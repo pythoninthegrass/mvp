@@ -1,3 +1,0 @@
-[submodule "data_science/pandas/pandas_meetup"]
-	path = data_science/pandas/pandas_meetup
-	url = https://github.com/pythoninthegrass/pandas_meetup.git
