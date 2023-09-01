@@ -1,13 +1,22 @@
+#!/usr/bin/make -f
+
 .DEFAULT_GOAL	:= help
-# TODO: test oneshell target (https://www.gnu.org/software/make/manual/html_node/One-Shell.html)
+
 .ONESHELL:
-export SHELL 	:= $(shell which sh)
-# .SHELLFLAGS 	:= -eu -o pipefail -c
-# MAKEFLAGS 		+= --warn-undefined-variables
 
 # ENV VARS
+export SHELL 	:= $(shell which sh)
+export PY_VER	:= "3.11.5"
 export UNAME 	:= $(shell uname -s)
 
+# MULTIPASS
+export NAME			:= testvm
+export IMAGE		:= 22.04
+export CPU			:= 4
+export DISK			:= 5G
+export MEM			:= 3G
+
+# check commands and OS
 ifeq ($(UNAME), Darwin)
 	export XCODE := $(shell xcode-select --install >/dev/null 2>&1; echo $$?)
 endif
@@ -20,7 +29,11 @@ ifeq ($(shell command -v brew >/dev/null 2>&1; echo $$?), 0)
 	export BREW := $(shell which brew)
 endif
 
-ifeq ($(shell command -v python >/dev/null 2>&1; echo $$?), 0)
+ifeq ($(shell command -v git >/dev/null 2>&1; echo $$?), 0)
+	export GIT := $(shell which git)
+endif
+
+ifeq ($(shell command -v python3 >/dev/null 2>&1; echo $$?), 0)
 	export PYTHON := $(shell which python3)
 endif
 
@@ -28,28 +41,8 @@ ifeq ($(shell command -v pip >/dev/null 2>&1; echo $$?), 0)
 	export PIP := $(shell which pip3)
 endif
 
-ifeq ($(shell command -v asdf >/dev/null 2>&1; echo $$?), 0)
-	export ASDF := $(shell which asdf)
-endif
-
 ifeq ($(shell command -v ansible >/dev/null 2>&1; echo $$?), 0)
 	export ANSIBLE := $(shell which ansible)
-endif
-
-ifeq ($(shell command -v ansible-galaxy >/dev/null 2>&1; echo $$?), 0)
-	export ANSIBLE_GALAXY := $(shell which ansible-galaxy)
-endif
-
-ifeq ($(shell command -v ansible-lint >/dev/null 2>&1; echo $$?), 0)
-	export ANSIBLE_LINT := $(shell which ansible-lint)
-endif
-
-ifeq ($(shell command -v just >/dev/null 2>&1; echo $$?), 0)
-	export JUST := $(shell which just)
-endif
-
-ifeq ($(shell command -v wget >/dev/null 2>&1; echo $$?), 0)
-	export WGET := $(shell which wget)
 endif
 
 ifneq (,$(wildcard /etc/os-release))
@@ -65,167 +58,134 @@ RESET  := $(shell tput -Txterm sgr0)
 
 # targets
 .PHONY: all
-all: ansible ansible-galaxy sanity-check git help homebrew just install mpr tldr update xcode
-
-# * cf. `distrobox create --name i-use-arch-btw --image archlinux:latest && distrobox enter i-use-arch-btw`
-# * || `distrobox create --name debby --image debian:stable && distrobox enter debby`
-
-sanity-check:  ## output environment variables
-	@echo "Checking environment..."
-	@echo "UNAME: ${UNAME}"
-	@echo "SHELL: ${SHELL}"
-	@echo "ID: ${ID}"
-	@echo "ID_LIKE: ${ID_LIKE}"
-	@echo "XCODE: ${XCODE}"
-	@echo "BREW: ${BREW}"
-	@echo "HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: ${HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK}"
-	@echo "PYTHON: ${PYTHON}"
-	@echo "PIP: ${PIP}"
+all: help xcode homebrew update git python pip ansible install release test list launch info shell stop start delete purge ## run all targets
 
 xcode: ## install xcode command line tools
-	if [ "${UNAME}" = "Darwin" ] && [ "${XCODE}" -ne 1 ]; then \
+	if [ "${UNAME}" = "Darwin" ] && [ -n "${XCODE}" ]; then \
 		echo "Installing Xcode command line tools..."; \
 		xcode-select --install; \
 	elif [ "${UNAME}" = "Darwin" ] && [ "${XCODE}" -eq 1 ]; then \
 		echo "xcode already installed."; \
 	else \
-		echo "xcode not available on macOS."; \
+		echo "xcode not supported."; \
 	fi
 
 homebrew: ## install homebrew
-	if [ "${UNAME}" = "Darwin" ] && [ -z "${BREW}" ]; then \
+	if [ "${UNAME}" = "Darwin" ] && [ -n "${BREW}" ]; then \
 		echo "Installing Homebrew..."; \
 		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
 	elif [ "${UNAME}" = "Darwin" ] && [ ! -z "${BREW}" ]; then \
 		echo "Homebrew already installed."; \
 	else \
-		echo "brew not available on macOS."; \
+		echo "brew not supported"; \
 	fi
 
 update: ## update package manager
 	@echo "Updating package manager..."
-	if [ "${UNAME}" = "Darwin" ] && [ "$(command -v brew >/dev/null 2>&1; echo $?)" -eq 0 ]; then \
+	if [ "${UNAME}" = "Darwin" ] && [ -n "${BREW}" ]; then \
 		brew update; \
 	elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "debian" ]; then \
 		sudo apt update; \
-	elif [ "${ID}" = "fedora" ]; then \
-		sudo dnf update; \
-	elif [ "${ID}" = "arch" ]; then \
-		yes | sudo pacman -Syu; \
 	fi
 
 git: ## install git
-	@echo "Installing Git..."
-	if [ "${UNAME}" = "Darwin" ] && [ "$(command -v brew >/dev/null 2>&1; echo $?)" -eq 0 ]; then \
+	if [ -n "${GIT}" ]; then \
+		echo "git already installed."; \
+		exit 0; \
+	fi
+	if [ "${UNAME}" = "Darwin" ] && [ -n "${BREW}" ]; then \
 		brew install git; \
 	elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "debian" ]; then \
 		sudo apt install -y git; \
-	elif [ "${ID}" = "fedora" ]; then \
-		sudo dnf install -y git; \
-	elif [ "${ID}" = "arch" ]; then \
-		yes | sudo pacman -S git; \
 	else \
-		echo "git already installed."; \
+		echo "git already installed"; \
 	fi
 
-python: ## install python
-	@echo "Installing Python..."
+python: ## install system python
+	if [ -n "${PYTHON}" ]; then \
+		echo "python already installed."; \
+		exit 0; \
+	fi
 	if [ "${UNAME}" = "Darwin" ] && [ -z "${PYTHON}" ]; then \
 		brew install python; \
-	elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "debian" ]; then \
+	elif [ "${ID}" = "ubuntu" ]; then \
 		sudo apt install -y python3; \
-	elif [ "${ID}" = "fedora" ]; then \
-		sudo dnf install -y python3; \
-	elif [ "${ID}" = "arch" ]; then \
-		yes | sudo pacman -S python; \
-	else \
-		echo "python already installed."; \
 	fi
 
 pip: python ## install pip
-	@echo "Installing Pip..."
+	if [ -n "${PIP}" ]; then \
+		echo "pip already installed."; \
+		exit 0; \
+	fi
 	if [ "${UNAME}" = "Darwin" ] && [ -z "${PYTHON})" ]; then \
 		brew install python; \
 	elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "debian" ] && [ -z "${PIP}" ]; then \
 		sudo apt install -y python3-pip; \
-	elif [ "${ID}" = "fedora" ] && [ -z "${PIP}" ]; then \
-		sudo dnf install -y python3-pip; \
-	elif [ "${ID}" = "arch" ] && [ -z "${PIP}" ]; then \
-		yes | sudo pacman -S python-pip; \
 	else \
-		echo "pip already installed."; \
+		echo "pip install not supported on os"; \
 	fi
 
-ansible: pip ## install ansible
-	if [ -z ${ANSIBLE} ]; then \
-		echo "Installing Ansible..."; \
-		if [ "${UNAME}" = "Darwin" ]; then \
-			brew install ansible ansible-lint; \
-		else \
-			python3 -m pip install ansible ansible-lint; \
-			sudo touch /var/log/ansible.log; \
-			sudo chmod 666 /var/log/ansible.log; \
-		fi; \
-	else \
-		echo "ansible already installed."; \
-	fi
+## * MULTIPASS START
+launch: ## launch a new instance of ubuntu
+	@echo "${YELLOW}Launching a new instance of ubuntu${RESET}"
+	multipass launch \
+		--name "${NAME}" "${IMAGE}" \
+		--cpus "${CPU}" \
+		--disk "${DISK}" \
+		--memory "${MEM}" \
+		--verbose \
+		--cloud-init ./cloud-config/cloud-init.ubuntu.yml
 
-ansible-galaxy: ansible git ## install ansible galaxy roles
-	@echo "Installing Ansible Galaxy roles..."
-	if [ ! -f /tmp/requirements.yml ]; then \
-		curl https://raw.githubusercontent.com/pythoninthegrass/framework/master/requirements.yml -o /tmp/requirements.yml; \
-	fi; \
-	if [ "${UNAME}" = "Darwin" ]; then \
-		ansible-galaxy install -r /tmp/requirements.yml; \
-	elif [ "${UNAME}" = "Linux" ]; then \
-		if [ ! -z "${ASDF}" ]; then \
-			asdf reshim python; \
-		fi; \
-		"${ANSIBLE_GALAXY}" install -r /tmp/requirements.yml; \
-	fi
+list:
+	@echo "${YELLOW}Listing instances${RESET}"
+	multipass list
 
-# TODO: QA @ kali
-mpr: ## install the makedeb package repo (mpr) for prebuilt packages
-	@echo "Installing the makedeb package repo (mpr)..."
-	if [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "debian" ]; then \
-		[ -z "${WGET}" ] || sudo apt install -y wget; \
-		wget -qO - 'https://proget.makedeb.org/debian-feeds/prebuilt-mpr.pub' | gpg --dearmor | sudo tee /usr/share/keyrings/prebuilt-mpr-archive-keyring.gpg 1> /dev/null; \
-		echo "deb [arch=amd64 signed-by=/usr/share/keyrings/prebuilt-mpr-archive-keyring.gpg] https://proget.makedeb.org prebuilt-mpr $(lsb_release -cs)" | sudo tee /etc/apt/sources.list.d/prebuilt-mpr.list; \
-	else \
-		echo "mpr not available on ${UNAME}."; \
-	fi
+info: ## show info about the instance
+	@echo "${YELLOW}Showing info about the instance${RESET}"
+	multipass info --format yaml "${NAME}"
 
-just: mpr update ## install justfile
-	if [ -z "${WGET}" ] && [ -z "${JUST}" ]; then \
-		echo "Installing Justfile..."; \
-		if [ "${UNAME}" = "Darwin" ]; then \
-			brew install just; \
-		elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "debian" ]; then \
-			sudo apt install -y just; \
-		elif [ "${ID}" = "fedora" ]; then \
-			sudo dnf install -y just; \
-		elif [ "${ID}" = "arch" ]; then \
-			yes | sudo pacman -S just; \
-		fi; \
-	else \
-		echo "just already installed."; \
-	fi
+shell: ## open a shell in the instance
+	@echo "${YELLOW}Opening a shell in the instance${RESET}"
+	multipass shell "${NAME}"
 
-tldr: ## install tldr
-	@echo "Installing Pip..."
-	if [ "${UNAME}" = "Darwin" ] && [ -z "${PYTHON})" ]; then \
-		brew install tldr; \
-	elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "debian" ] && [ -z "${PIP}" ]; then \
-		sudo apt install -y tldr-py; \
-	elif [ "${ID}" = "fedora" ] && [ -z "${PIP}" ]; then \
-		sudo dnf install -y tldr; \
-	elif [ "${ID}" = "arch" ] && [ -z "${PIP}" ]; then \
-		yes | sudo pacman -S tldr; \
-	else \
-		echo "tldr already installed."; \
-	fi
+mount: ## mount volume in instance
+	@echo "${YELLOW}Mounting the instance${RESET}"
+	multipass mount $(shell pwd) "${NAME}":~/git/$(shell basename $(shell pwd))
 
-install: sanity-check update xcode homebrew git python pip ansible ansible-galaxy mpr just tldr  ## install all dependencies
+stop: ## stop the instance
+	@echo "${YELLOW}Stopping the instance${RESET}"
+	multipass stop "${NAME}"
+
+start: ## start the instance
+	@echo "${YELLOW}Starting the instance${RESET}"
+	multipass start "${NAME}"
+
+delete: stop ## delete the instance
+	@echo "${YELLOW}Deleting the instance${RESET}"
+	multipass delete "${NAME}"
+
+purge: ## purge all instances
+	@echo "${YELLOW}Purging all instances${RESET}"
+	multipass purge
+## ! MULTIPASS END
+
+run: ## run ansible playbook
+	@echo "${YELLOW}Running ansible playbook${RESET}"
+	#!/usr/bin/env bash
+	# set -euxo pipefail
+	multipass exec "${NAME}" -- \
+		ansible-playbook \
+			/home/ubuntu/apt_lab_tf/ansible/playbook.yml \
+			--tags qa \
+			-vvv
+
+install: xcode homebrew git python pip ansible ## install dependencies
+
+release: ## release package
+	[ ! -z "${POETRY}" ] && poetry build
+
+test: ## run tests
+	[ ! -z "${POETRY}" ] && poetry run pytest
 
 help: ## show this help
 	@echo ''

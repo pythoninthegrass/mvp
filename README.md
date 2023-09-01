@@ -25,9 +25,6 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
     * [macOS](https://www.freecodecamp.org/news/install-xcode-command-line-tools/)
   * [editorconfig](https://editorconfig.org/)
   * [wsl](https://docs.microsoft.com/en-us/windows/wsl/setup/environment)
-  * [asdf](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)
-  * [poetry](https://python-poetry.org/docs/)
-  * [docker-compose](https://docs.docker.com/compose/install/)
 
 ## Quickstart
 
@@ -36,7 +33,7 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
 ./bootstrap install
 
 # install tools and runtimes (cf. xcode, brew, asdf, poetry, etc.)
-./bootstrap run-playbook
+./bootstrap <run|run-dev>   # dev only runs plays w/tags and is verbose
 
 # install git hooks
 ./bootstrap install-precommit
@@ -57,5 +54,8 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
 
 ## Further Reading
 
-* [Python](https://www.python.org/)
-* [Pre-commit hooks](https://pre-commit.com/)
+* [python](https://www.python.org/)
+* [asdf](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)
+* [poetry](https://python-poetry.org/docs/)
+* [docker-compose](https://docs.docker.com/compose/install/)
+* [pre-commit hooks](https://pre-commit.com/)

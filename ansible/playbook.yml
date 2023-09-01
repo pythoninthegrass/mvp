@@ -1,0 +1,270 @@
+# code: language=ansible
+
+---
+- hosts: localhost
+  become: false
+  gather_facts: true
+  any_errors_fatal: false
+  environment:
+    PATH: "$HOME/.local/bin:$HOME/.asdf/bin:$HOME/.asdf/shims:{{ lookup('env', 'PATH') }}"
+  vars:
+    os_environment:
+      - key: EDITOR
+        value: vim
+    # TODO: test compile in multipass with a multicore vm
+    plugin:
+      - name: python
+        scope: local
+        version: latest
+      - name: poetry
+        scope: local
+        version: latest
+    container_name: hello
+    container_image: hello-world:latest
+    container_command: sleep 1d
+  pre_tasks:
+    # - name: Print all available facts
+    #   ansible.builtin.debug:
+    #     var: ansible_facts
+
+    - name: Get running ansible user
+      become_user: "{{ ansible_env.SUDO_USER }}"
+      ansible.builtin.set_fact:
+        local_user: "{{ ansible_env.SUDO_USER }}"
+        work_dir: "{{ ansible_env.PWD }}"
+        cacheable: true
+      tags: qa
+
+    - name: Get running ansible user home
+      ansible.builtin.shell: >
+          getent passwd {{ local_user }}  | awk -F: '{ print $6 }'
+      register: home_dir
+      changed_when: false
+      tags: qa
+
+    - name: Top-level directory in project
+      ansible.builtin.shell: |
+        if [ -d ".git" ]; then
+          git rev-parse --show-toplevel
+        else
+          echo "{{ work_dir }}"
+        fi
+      register: tld
+      changed_when: false
+      tags: qa
+
+  tasks:
+    # TODO: test macos items
+    - name: Install xcode command line tools on macos
+      ansible.builtin.command: |
+        xcode-select --install
+      changed_when: false
+      when: ansible_os_family == 'Darwin'
+      tags: test
+
+    - name: Install homebrew on macos
+      ansible.builtin.command: |
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      changed_when: false
+      when: ansible_os_family == 'Darwin'
+      tags: test
+
+    - name: Update package manager
+      ansible.builtin.package:
+        name: '*'
+        state: latest
+
+    - name: macos dependencies
+      ansible.builtin.package:
+        name:
+        - coreutils
+        - gettext
+        - openssl
+        - readline
+        - sqlite3
+        - tcl-tk
+        - xz
+        - zlib
+        state: present
+      when: ansible_os_family == 'Darwin'
+
+    - name: Cross-platform dependencies
+      become: true
+      ansible.builtin.package:
+        name:
+        - curl
+        - git
+        - make
+        - tree
+        - vim
+        - wget
+        state: present
+
+    - debug:
+        var: home_dir.stdout
+        verbosity: 0
+
+    - name: Clone asdf
+      become_user: "{{ local_user }}"
+      ansible.builtin.git:
+        repo: https://github.com/asdf-vm/asdf.git
+        dest: "{{ home_dir.stdout }}/.asdf"
+        clone: true
+        update: false
+        force: false
+
+    - name: Check if asdf source is already defined
+      become: true
+      become_user: "{{ local_user }}"
+      ansible.builtin.shell:
+        cmd: |
+          grep -c "^. $HOME/.asdf/asdf.sh" {{ home_dir.stdout }}/.bashrc || true
+      register: check
+
+    # TODO: add newline before block
+    - name: Add asdf to bashrc
+      become: true
+      become_user: "{{ local_user }}"
+      ansible.builtin.blockinfile:
+        path: "{{ home_dir.stdout }}/.bashrc"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+        insertafter: EOF
+        block: |
+          # asdf
+          . $HOME/.asdf/asdf.sh
+          . $HOME/.asdf/completions/asdf.bash
+      when: check.stdout == "0"
+
+    - name: Debian dependencies to compile python
+      become: true
+      ansible.builtin.apt:
+        name:
+        - build-essential
+        - libbz2-dev
+        - libffi-dev
+        - liblzma-dev
+        - libncursesw5-dev
+        - libreadline-dev
+        - libsqlite3-dev
+        - libssl-dev
+        - libxml2-dev
+        - libxmlsec1-dev
+        - llvm
+        - tk-dev
+        - xz-utils
+        - zlib1g-dev
+        state: present
+      when: ansible_os_family == 'Debian'
+
+    - name: Install asdf plugins for python and poetry
+      become: true
+      become_user: "{{ local_user }}"
+      ansible.builtin.shell: |
+        asdf plugin-add "{{ item.name }}"
+        asdf install "{{ item.name }}" "{{ item.version }}"
+        asdf global "{{ item.name }}" "{{ item.version }}"
+      loop: "{{ plugin }}"
+
+    - name: Reshim asdf python
+      become: true
+      become_user: "{{ local_user }}"
+      ansible.builtin.command: |
+        asdf reshim python
+      changed_when: false
+
+    - name: Install docker on macos
+      ansible.builtin.shell: |
+        brew install --cask docker
+      when: ansible_os_family == 'Darwin'
+      tags: qa
+
+    - name: Install docker dependencies on debian/ubuntu
+      become: true
+      ansible.builtin.package:
+        name:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg
+        - lsb-release
+        state: present
+      when: ansible_os_family == 'Debian'
+
+    - name: Download docker gpg key to /tmp
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /tmp/docker.gpg
+      when: ansible_os_family == 'Debian'
+
+    - name: Add docker gpg key
+      ansible.builtin.lineinfile:
+        path: /usr/share/keyrings/docker-archive-keyring.gpg
+        line: |
+          {{ lookup('file', '/tmp/docker.gpg') }}
+        state: present
+        create: true
+        insertafter: EOF
+        backup: no
+      when: ansible_os_family == 'Debian'
+
+    - name: Add docker repo
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/apt/sources.list.d/docker.list
+        line: |
+          deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
+        state: present
+        create: true
+        insertafter: EOF
+        backup: no
+      when: ansible_os_family == 'Debian'
+
+    - name: Install docker on debian/ubuntu
+      ansible.builtin.package:
+        name:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        state: present
+      when: ansible_os_family == 'Debian'
+
+    - name: Enable docker service
+      become: true
+      ansible.builtin.service:
+        name: docker
+        enabled: true
+        state: started
+      when: ansible_os_family == "Debian"
+
+    - name: Enable containerd service
+      become: true
+      ansible.builtin.service:
+        name: containerd
+        enabled: true
+        state: started
+      when: ansible_os_family == "Debian"
+
+    - name: Add user to docker group
+      become: true
+      ansible.builtin.user:
+        name: "{{ local_user }}"
+        groups: docker
+        append: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install docker sdk for python after sourcing bashrc
+      become: true
+      become_user: "{{ local_user }}"
+      ansible.builtin.shell: |
+        source "{{ home_dir.stdout }}/.bashrc"
+        python -m pip install docker
+      args:
+        executable: /bin/bash
+
+    - name: Pull default Docker image
+      become: true
+      become_user: "{{ local_user }}"
+      ansible.builtin.shell: |
+        source "{{ home_dir.stdout }}/.bashrc"
+        docker pull "{{ container_image }}"
+      changed_when: false
