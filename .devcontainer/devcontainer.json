@@ -2,9 +2,11 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/python
 {
   "name": "Dev Environment",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
+  // "build": {
+  //   "dockerfile": "../Dockerfile"
+  // }
+  "dockerComposeFile": "../docker-compose.yml",
+  "shutdownAction": "stopCompose",
   "customizations": {
     "vscode": {
       "extensions": [

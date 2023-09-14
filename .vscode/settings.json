@@ -10,4 +10,5 @@
     "python.analysis.ignore": [
       "*"
     ],
+    "ansible.python.interpreterPath": "/Users/lance/.asdf/shims/python",
 }
