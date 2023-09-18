@@ -5,9 +5,9 @@
 .ONESHELL:
 
 # ENV VARS
-export SHELL 	:= $(shell which sh)
-export PY_VER	:= "3.11.5"
-export UNAME 	:= $(shell uname -s)
+export SHELL 		:= $(shell which sh)
+export PY_VER		:= "3.11.5"
+export UNAME 		:= $(shell uname -s)
 
 # MULTIPASS
 export NAME			:= testvm
@@ -125,7 +125,7 @@ pip: python ## install pip
 		echo "pip install not supported on os"; \
 	fi
 
-## * MULTIPASS START
+# * MULTIPASS START
 launch: ## launch a new instance of ubuntu
 	@echo "${YELLOW}Launching a new instance of ubuntu${RESET}"
 	multipass launch \
@@ -167,7 +167,7 @@ delete: stop ## delete the instance
 purge: ## purge all instances
 	@echo "${YELLOW}Purging all instances${RESET}"
 	multipass purge
-## ! MULTIPASS END
+# ! MULTIPASS END
 
 run: ## run ansible playbook
 	@echo "${YELLOW}Running ansible playbook${RESET}"
