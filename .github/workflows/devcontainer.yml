@@ -27,6 +27,7 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           imageName: ghcr.io/pythoninthegrass/mvp
-          cacheFrom: ghcr.io/pythoninthegrass/mvp
+          # cacheFrom: ghcr.io/pythoninthegrass/mvp
+          noCache: true
           push: always
           runCmd: make ci-build
