@@ -9,7 +9,7 @@ FROM python:${PYTHON_VERSION}-slim-bullseye AS builder
 ARG DEBIAN_FRONTEND=noninteractive
 
 # update apt repos and install dependencies
-RUN apt -qq update && apt -qq install \
+RUN apt update && apt install \
     --no-install-recommends -y \
     curl \
     gcc \
@@ -24,7 +24,7 @@ ENV PIP_DEFAULT_TIMEOUT=100
 
 # poetry env vars
 ENV POETRY_HOME="/opt/poetry"
-ENV POETRY_VERSION=1.5.1
+ENV POETRY_VERSION=1.6.1
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 ENV POETRY_NO_INTERACTION=1
 
