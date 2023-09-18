@@ -4,7 +4,7 @@ services:
   app:
     container_name: mvp-app
     hostname: mvp
-    platform: linux/arm64/v8          # linux/amd64 / linux/arm64/v8
+    platform: linux/amd64             # linux/amd64 / linux/arm64/v8
     tty: true                         # false for `entrypoint` in Dockerfile
     stdin_open: true                  # false for `entrypoint` in Dockerfile
     build:
