@@ -9,7 +9,7 @@ FROM python:${PYTHON_VERSION}-slim-bullseye AS builder
 ARG DEBIAN_FRONTEND=noninteractive
 
 # update apt repos and install dependencies
-RUN apt update && apt install \
+RUN apt -qq update && apt -qq install \
     --no-install-recommends -y \
     curl \
     gcc \
@@ -72,6 +72,7 @@ RUN apt -qq update && apt -qq install \
     git \
     iputils-ping \
     lsof \
+    make \
     p7zip \
     perl \
     shellcheck \
