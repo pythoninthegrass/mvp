@@ -36,11 +36,12 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pre-build image and run make ci-build in dev container
+      - name: Pre-build image and run command in dev container
         uses: devcontainers/ci@v0.3
         with:
           imageName: ghcr.io/pythoninthegrass/mvp
-          # cacheFrom: ghcr.io/pythoninthegrass/mvp
-          noCache: true
+          cacheFrom: ghcr.io/pythoninthegrass/mvp
+          noCache: false
           push: always
-          runCmd: make ci-build
+          runCmd: |
+            make help
