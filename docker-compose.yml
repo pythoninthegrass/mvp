@@ -12,3 +12,9 @@ services:
       dockerfile: ./Dockerfile
       args:
         - DEBIAN_FRONTEND=noninteractive
+    ports:
+      - "8000:8000/tcp"
+      - "8080:8080/tcp"
+    volumes:
+      - ./:/app
+    working_dir: /app
