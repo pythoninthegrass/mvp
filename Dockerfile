@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.6
 
 # full semver just for python base image
-ARG PYTHON_VERSION=3.11.4
+ARG PYTHON_VERSION=3.11.5
 
 FROM python:${PYTHON_VERSION}-slim-bullseye AS builder
 
