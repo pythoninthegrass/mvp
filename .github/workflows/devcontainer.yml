@@ -10,14 +10,27 @@ on: # rebuild any PRs and main branch changes
     - cron: '0 0 * * 6'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  ci:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        arch: [x64]
+    runs-on: ${{ matrix.os }}
+
     steps:
       - name: Checkout (GitHub)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: ${{ matrix.arch }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
