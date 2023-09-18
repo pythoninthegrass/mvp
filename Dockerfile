@@ -89,9 +89,6 @@ mkdir -p /app/{certs,staticfiles}
 chown -R "${USER_NAME}:${USER_GROUP}" /app/
 EOF
 
-USER $USER_NAME
-WORKDIR $HOME
-
 COPY --from=builder --chown=${USER_NAME}:${USER_GROUP} $VENV $VENV
 
 # qol: tooling
@@ -110,6 +107,8 @@ git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 yes | ~/.fzf/install
 EOF
 
+USER $USER_NAME
+
 # qol: .bashrc
 RUN tee -a $HOME/.bashrc <<EOF
 # shared history
@@ -126,6 +125,8 @@ alias ..='cd ../'
 alias ...='cd ../../'
 alias ll='ls -la --color=auto'
 EOF
+
+WORKDIR /app
 
 # $PATH
 ENV PATH=$VENV_PATH/bin:$HOME/.local/bin:$PATH
