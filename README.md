@@ -6,7 +6,6 @@
 **minimum viable python**
 
 ## Summary
-
 Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
 
 **Table of Contents**
@@ -14,24 +13,27 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
   * [Summary](#summary)
   * [Setup](#setup)
   * [Quickstart](#quickstart)
+  * [Development](#development)
   * [TODO](#todo)
   * [Further Reading](#further-reading)
 
 ## Setup
-
-* Install
+* Dependencies
   * make
-    * [Debian/Ubuntu](https://www.gnu.org/software/make/)
+    * [Linux](https://www.gnu.org/software/make/)
     * [macOS](https://www.freecodecamp.org/news/install-xcode-command-line-tools/)
   * [editorconfig](https://editorconfig.org/)
   * [wsl](https://docs.microsoft.com/en-us/windows/wsl/setup/environment)
 
 ## Quickstart
+* Install python and tooling
+    ```bash
+    # install python and dependencies (e.g., git, ansible, etc.)
+    ./bootstrap install
+    ```
 
+## Development
 ```bash
-# install dependencies (e.g., git, ansible, etc.)
-./bootstrap install
-
 # install tools and runtimes (cf. xcode, brew, asdf, poetry, etc.)
 ./bootstrap <run|run-dev>   # dev only runs plays w/tags and is verbose
 
@@ -43,7 +45,6 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
 ```
 
 ## TODO
-
 * [Open Issues](https://github.com/pythoninthegrass/mvp/issues)
 * QA [Ansible playbook](ansible/playbook.yml)
   * Test
@@ -53,7 +54,6 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
 * CI/CD
 
 ## Further Reading
-
 * [python](https://www.python.org/)
 * [asdf](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)
 * [poetry](https://python-poetry.org/docs/)
