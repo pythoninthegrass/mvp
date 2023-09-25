@@ -108,7 +108,7 @@ python: ## install system python
 	fi
 	if [ "${UNAME}" = "Darwin" ] && [ -z "${PYTHON}" ]; then \
 		brew install python; \
-	elif [ "${ID}" = "ubuntu" ]; then \
+	elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "debian" ]; then \
 		sudo apt install -y python3; \
 	fi
 
