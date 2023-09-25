@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-.DEFAULT_GOAL	:= help
+.DEFAULT_GOAL		:= help
 
 .ONESHELL:
 
