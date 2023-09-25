@@ -44,6 +44,6 @@ case "$1" in
         sh -c "make test"
         ;;
   	*)
-		echo $"Usage: $0 {install|release|test}"
+		echo $"Usage: $0 <install|run|run-dev|install-precommit|update-precommit|release|test>"
 		exit 1
 esac
