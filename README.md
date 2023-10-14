@@ -18,7 +18,9 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
   * [Further Reading](#further-reading)
 
 ## Setup
-* Dependencies
+* Minimum requirements
+  * [Python 3.11](https://www.python.org/downloads/)
+* Dev dependencies
   * make
     * [Linux](https://www.gnu.org/software/make/)
     * [macOS](https://www.freecodecamp.org/news/install-xcode-command-line-tools/)
