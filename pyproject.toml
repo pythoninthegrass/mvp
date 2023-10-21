@@ -6,7 +6,7 @@ authors = ["pythoninthegrass <4097471+pythoninthegrass@users.noreply.github.com>
 license = "Unlicense"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.13"
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.4.0"
@@ -16,7 +16,7 @@ pytest-cov = "^4.0.0"
 pytest-datafiles = "^3.0.0"
 pytest-xdist = "^2.5.0"
 rich = "^12.6.0"
-ruff = "^0.0.269"
+ruff = "^0.1.1"
 
 [tool.ruff]
 # Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
