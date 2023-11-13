@@ -39,6 +39,12 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
 # install tools and runtimes (cf. xcode, brew, asdf, poetry, etc.)
 ./bootstrap <run|run-dev>   # dev only runs plays w/tags and is verbose
 
+# update pyproject.toml and poetry.lock
+./bootstrap bump-deps
+
+# export requirements.txt
+./bootstrap export-reqs
+
 # install git hooks
 ./bootstrap install-precommit
 
