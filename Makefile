@@ -6,7 +6,7 @@
 
 # ENV VARS
 export SHELL 		:= $(shell which sh)
-export PY_VER		:= "3.11.5"
+export PY_VER		:= "3.12.0"
 export UNAME 		:= $(shell uname -s)
 
 # MULTIPASS
