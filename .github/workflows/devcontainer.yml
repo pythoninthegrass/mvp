@@ -1,13 +1,8 @@
 # https://github.com/devcontainers/ci/blob/main/docs/github-action.md
 
 name: 'devcontainer'
-on: # rebuild any PRs and main branch changes
-  pull_request:
-  push:
-    branches:
-      - main
-  schedule: # rebuild once a week at midnight on saturday
-    - cron: '0 0 * * 6'
+on: # manually triggered
+  workflow_dispatch:
 
 jobs:
   ci:
