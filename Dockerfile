@@ -1,15 +1,15 @@
 # syntax=docker/dockerfile:1.6
 
 # full semver just for python base image
-ARG PYTHON_VERSION=3.11.5
+ARG PYTHON_VERSION=3.11.6
 
 FROM python:${PYTHON_VERSION}-slim-bullseye AS builder
 
 # avoid stuck build due to user prompt
 ARG DEBIAN_FRONTEND=noninteractive
 
-# update apt repos and install dependencies
-RUN apt -qq update && apt -qq install \
+# update apt-get repos and install dependencies
+RUN apt-get -qq update && apt-get -qq install \
     --no-install-recommends -y \
     curl \
     gcc \
@@ -24,7 +24,7 @@ ENV PIP_DEFAULT_TIMEOUT=100
 
 # poetry env vars
 ENV POETRY_HOME="/opt/poetry"
-ENV POETRY_VERSION=1.6.1
+ENV POETRY_VERSION=1.7.1
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 ENV POETRY_NO_INTERACTION=1
 
@@ -32,22 +32,19 @@ ENV POETRY_NO_INTERACTION=1
 ENV VENV="/opt/venv"
 ENV PATH="$POETRY_HOME/bin:$VENV/bin:$PATH"
 
+WORKDIR /app
+
 COPY requirements.txt requirements.txt
 
 RUN python -m venv $VENV \
-    && . "${VENV}/bin/activate"\
+    && . "${VENV}/bin/activate" \
     && python -m pip install "poetry==${POETRY_VERSION}" \
     && python -m pip install -r requirements.txt
 
-FROM python:${PYTHON_VERSION}-slim-bullseye AS runner
+FROM python:${PYTHON_VERSION}-slim-bullseye AS dev
 
-# setup standard non-root user for use downstream
-ENV USER_NAME=appuser
-ENV USER_GROUP=appuser
-ENV HOME="/home/${USER_NAME}"
 ENV HOSTNAME="${HOST:-localhost}"
 ENV VENV="/opt/venv"
-
 ENV PATH="${VENV}/bin:${VENV}/lib/python${PYTHON_VERSION}/site-packages:/usr/local/bin:${HOME}/.local/bin:/bin:/usr/bin:/usr/share/doc:$PATH"
 
 # standardise on locale, don't generate .pyc, enable tracebacks on seg faults
@@ -64,7 +61,7 @@ ENV WEB_CONCURRENCY=2
 ARG DEBIAN_FRONTEND=noninteractive
 
 # install dependencies
-RUN apt -qq update && apt -qq install \
+RUN apt-get -qq update && apt-get -qq install \
     --no-install-recommends -y \
     bat \
     curl \
@@ -80,15 +77,13 @@ RUN apt -qq update && apt -qq install \
     tree \
     && rm -rf /var/lib/apt/lists/*
 
-RUN groupadd $USER_NAME \
-    && useradd -m $USER_NAME -g $USER_GROUP
+# setup standard non-root user for use downstream
+ARG USER_NAME=appuser
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
 
-# create read/write dirs
-RUN <<EOF
-#!/usr/bin/env bash
-mkdir -p /app/{certs,staticfiles}
-chown -R "${USER_NAME}:${USER_GROUP}" /app/
-EOF
+RUN groupadd --gid $USER_GID $USER_NAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USER_NAME
 
 COPY --from=builder --chown=${USER_NAME}:${USER_GROUP} $VENV $VENV
 
@@ -99,8 +94,8 @@ RUN <<EOF
 curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
 chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-apt update && apt install gh -y
-apt remove dpkg -y
+apt-get update && apt-get install --no-install-recommends gh -y
+apt-get remove dpkg -y
 rm -rf /var/lib/apt/lists/*
 
 # fzf
@@ -111,7 +106,7 @@ EOF
 USER $USER_NAME
 
 # qol: .bashrc
-RUN tee -a $HOME/.bashrc <<EOF
+RUN tee -a "$HOME/.bashrc" <<EOF
 # shared history
 HISTFILE=/var/tmp/.bash_history
 HISTFILESIZE=100
@@ -126,6 +121,8 @@ alias ..='cd ../'
 alias ...='cd ../../'
 alias ll='ls -la --color=auto'
 EOF
+
+FROM dev AS runner
 
 WORKDIR /app
 
