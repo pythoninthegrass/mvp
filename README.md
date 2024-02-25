@@ -18,6 +18,7 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
     * [Makefile](#makefile)
     * [Taskfile](#taskfile)
     * [Devbox](#devbox)
+    * [Tilt](#tilt)
   * [TODO](#todo)
   * [Further Reading](#further-reading)
 
@@ -95,6 +96,17 @@ exit
 
 # run tests
 devbox run test
+```
+
+### Tilt
+```bash
+minikube start --memory=2048 --cpus=2 --kubernetes-version=v1.28.3 -p minikube
+git clone https://github.com/tilt-dev/tilt-example-python
+cd tilt-example-python/3-recommended
+tilt up
+minikube stop
+minikube delete
+rm -rf tilt-example-python
 ```
 
 ## TODO

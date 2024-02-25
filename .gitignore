@@ -3,6 +3,7 @@
 !*.example
 *.pem
 .ruff*
+tilt-example-python/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

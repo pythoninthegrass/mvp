@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mvp
+  labels:
+    app: mvp
+spec:
+  selector:
+    matchLabels:
+      app: mvp
+  template:
+    metadata:
+      labels:
+        app: mvp
+    spec:
+      containers:
+        - name: mvp
+          image: mvp:latest
+          ports:
+            - containerPort: 8000
