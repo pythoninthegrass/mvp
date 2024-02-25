@@ -17,7 +17,6 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
     * [Makefile](#makefile)
     * [Taskfile](#taskfile)
     * [Devbox](#devbox)
-    * [Bootstrap (wip)](#bootstrap-wip)
   * [TODO](#todo)
   * [Further Reading](#further-reading)
 
@@ -57,6 +56,8 @@ task: Available tasks for this project:
 * export-reqs:          Export requirements.txt
 * install:              Install project dependencies
 * pre-commit:           Run pre-commit hooks
+* run:                  Run the playbook
+* run-dev:              Run the playbook with tags and debug
 * update-deps:          Update dependencies
 * docker:build:         Build the docker image
 * docker:down:          Stop and remove containers, networks, and volumes with docker compose
@@ -87,24 +88,6 @@ devbox run start
 
 # run tests
 devbox run test
-```
-
-### Bootstrap (wip)
-```bash
-# install tools and runtimes (cf. xcode, brew, asdf, poetry, etc.)
-./bootstrap <run|run-dev>   # dev only runs plays w/tags and is verbose
-
-# update pyproject.toml and poetry.lock
-./bootstrap bump-deps
-
-# export requirements.txt
-./bootstrap export-reqs
-
-# install git hooks
-./bootstrap install-precommit
-
-# update git hooks
-./bootstrap update-precommit
 ```
 
 ## TODO

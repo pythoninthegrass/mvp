@@ -53,7 +53,7 @@ tasks:
     desc: "Install project dependencies"
     cmds:
       - |
-        {{.INSTALL}} {{.CLI_ARGS}}
+        make install
 
   pre-commit:
     desc: "Run pre-commit hooks"
@@ -70,6 +70,7 @@ tasks:
     cmds:
       - |
         poetry cache clear --all pypi --no-ansi
+        poetry up 2>/dev/null
         poetry update --lock --no-ansi
 
   export-reqs:
@@ -83,3 +84,26 @@ tasks:
           --without-hashes \
           --no-ansi
     ignore_error: true
+
+  run:
+    desc: "Run the playbook"
+    cmds:
+      - |
+        if [[ -z {{.ARGS}} ]]; then
+          ansible-playbook \
+            -i ./ansible/hosts \
+            {{.ARGS}}
+        else
+          ansible-playbook \
+            -i ./ansible/hosts \
+            ./ansible/playbook.yml
+        fi
+
+  run-dev:
+    desc: "Run the playbook with tags and debug"
+    cmds:
+      - |
+        ansible-playbook \
+          -i ./ansible/hosts \
+          {{.ARGS}} \
+          --tags test,qa -vvv
