@@ -1,6 +1,46 @@
 {
   "lockfile_version": "1",
   "packages": {
+    "ansible-lint@latest": {
+      "last_modified": "2024-02-19T20:09:34Z",
+      "resolved": "github:NixOS/nixpkgs/93e1c2d08467d1117ebac45689469613a9fe8453#ansible-lint",
+      "source": "devbox-search",
+      "version": "24.2.0",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/daf4117rskx766180qmkfylwdbh4ii17-ansible-lint-24.2.0"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/ixgxwfrcgazjpkvh5sh4ip662750nk8w-ansible-lint-24.2.0"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/6lndn4627cg617s9y8n50rrss1mfvqii-ansible-lint-24.2.0"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/k2hdrpsh7wywys8138xjf7z658i7a1na-ansible-lint-24.2.0"
+        }
+      }
+    },
+    "ansible@latest": {
+      "last_modified": "2024-02-19T20:09:34Z",
+      "resolved": "github:NixOS/nixpkgs/93e1c2d08467d1117ebac45689469613a9fe8453#ansible",
+      "source": "devbox-search",
+      "version": "2.16.3",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/y5p9dwcl9bjblgw8isr8wqxswf3q5403-python3.11-ansible-core-2.16.3"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/6ip5v0an583f7m8nrj2pvxrjprbcl187-python3.11-ansible-core-2.16.3"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/s7vaf8v0g9nf4wzmnhvvv4b64yqldj1r-python3.11-ansible-core-2.16.3"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/y5qhv6y22i1mgjbgnfm0imwsvwk8f86q-python3.11-ansible-core-2.16.3"
+        }
+      }
+    },
     "docker@latest": {
       "last_modified": "2024-02-01T15:59:28Z",
       "resolved": "github:NixOS/nixpkgs/f38bca1ca559974b36863d0ff4bb710b7bc12890#docker",

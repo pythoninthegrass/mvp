@@ -4,6 +4,8 @@
     "python311Packages.pip@latest",
     "poetry@latest",
     "docker@latest",
+    "ansible@latest",
+    "ansible-lint@latest",
     "gh@latest",
     "git@latest",
     "gnumake@latest",
