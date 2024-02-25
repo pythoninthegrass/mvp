@@ -12,7 +12,8 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
 * [mvp](#mvp)
   * [Summary](#summary)
   * [Setup](#setup)
-  * [Quickstart](#quickstart)
+    * [Minimum requirements](#minimum-requirements)
+    * [Recommended requirements](#recommended-requirements)
   * [Development](#development)
     * [Makefile](#makefile)
     * [Taskfile](#taskfile)
@@ -21,7 +22,7 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
   * [Further Reading](#further-reading)
 
 ## Setup
-* Minimum requirements
+### Minimum requirements
   * [Python 3.11](https://www.python.org/downloads/)
 * Dev dependencies
   * make
@@ -30,12 +31,9 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
   * [editorconfig](https://editorconfig.org/)
   * [wsl](https://docs.microsoft.com/en-us/windows/wsl/setup/environment)
 
-## Quickstart
-* Install python and tooling
-    ```bash
-    # install python and dependencies (e.g., git, ansible, etc.)
-    ./bootstrap install
-    ```
+### Recommended requirements
+* [devbox](https://www.jetpack.io/devbox/docs/quickstart/)
+* [task](https://taskfile.dev/#/installation)
 
 ## Development
 ### Makefile
@@ -72,19 +70,28 @@ task: Available tasks for this project:
 ```
 
 ### Devbox
-I.e., [Nix Package Manager](https://search.nixos.org/packages)
+Devbox takes care of setting up a dev environment automatically. Under the hood it uses [Nix Package Manager](https://search.nixos.org/packages).
+
+Currently, it supports the following:
+* [asdf](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)
+* [docker](https://docs.docker.com/compose/install/)
+* [gh](https://cli.github.com/manual/)
+* [minikube](https://minikube.sigs.k8s.io/docs/start/)
+* [nodejs (21.4)](https://nodejs.org/en/download/)
+* [poetry](https://python-poetry.org/docs/)
+* [python (3.11)](https://www.python.org/)
+* [task](https://taskfile.dev/#/installation)
+* [tilt](https://docs.tilt.dev/install.html)
+
 ```bash
 # enter dev environment
 devbox shell
 
-# run individual app
-python <sign_jwt|meetup_query|slackbot|main>.py
+# run repl
+python
 
 # exit dev environment
 exit
-
-# run standalone server
-devbox run start
 
 # run tests
 devbox run test
