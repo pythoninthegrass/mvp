@@ -66,9 +66,6 @@ devbox: ## install devbox
 	else \
 		echo "devbox already installed."; \
 	fi
-else
-	@echo "asdf not supported."
-endif
 
 asdf: xcode ## install asdf
 ifeq ($(UNAME), Darwin)
@@ -82,9 +79,10 @@ ifeq ($(UNAME), Darwin)
 	else \
 		echo "asdf already installed."; \
 	fi
+endif
 
 git: ## install git
-	if [ -n "${GIT}" ]; then \
+	@if [ -n "${GIT}" ]; then \
 		echo "git already installed."; \
 		exit 0; \
 	fi
@@ -93,7 +91,20 @@ git: ## install git
 	elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "debian" ]; then \
 		sudo apt install -y git; \
 	else \
+		echo "Uncaught error"; \
+	fi
+
+pre-commit: ## install pre-commit
+	@if [ -n "${PRE_COMMIT}" ]; then \
 		echo "pre-commit already installed."; \
+		exit 0; \
+	fi
+	@if [ "${UNAME}" = "Darwin" ] && [ -n "${BREW}" ]; then \
+		brew install pre-commit; \
+	elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "debian" ]; then \
+		python3 -m pip install pre-commit; \
+	else \
+		echo "Uncaught error"; \
 	fi
 
 task: ## install taskfile
