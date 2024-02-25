@@ -25,9 +25,12 @@ ifeq ($(UNAME), Darwin)
 	export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK := 1
 endif
 
-ifeq ($(shell command -v brew >/dev/null 2>&1; echo $$?), 0)
-	export BREW := $(shell which brew)
-endif
+export ASDF := $(shell command -v asdf 2>/dev/null)
+export BREW := $(shell command -v brew 2>/dev/null)
+export DEVBOX := $(shell command -v devbox 2>/dev/null)
+export GIT := $(shell command -v git 2>/dev/null)
+export PRE_COMMIT := $(shell command -v pre-commit 2>/dev/null)
+export TASK := $(shell command -v task 2>/dev/null)
 
 ifeq ($(shell command -v git >/dev/null 2>&1; echo $$?), 0)
 	export GIT := $(shell which git)
@@ -58,7 +61,7 @@ RESET  := $(shell tput -Txterm sgr0)
 
 # targets
 .PHONY: all
-all: help xcode homebrew update git python pip ansible install release test list launch info shell stop start delete purge ## run all targets
+all: help asdf xcode brew devbox pre-commit task ## run all targets
 
 xcode: ## install xcode command line tools
 	if [ "${UNAME}" = "Darwin" ] && [ -n "${XCODE}" ]; then \
@@ -80,12 +83,25 @@ homebrew: ## install homebrew
 		echo "brew not supported"; \
 	fi
 
-update: ## update package manager
-	@echo "Updating package manager..."
-	if [ "${UNAME}" = "Darwin" ] && [ -n "${BREW}" ]; then \
-		brew update; \
-	elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "debian" ]; then \
-		sudo apt update; \
+devbox: ## install devbox
+	@if [ -z "${DEVBOX}" ]; then \
+		echo "Installing devbox..."; \
+		curl -fsSL https://get.jetpack.io/devbox | bash; \
+	else \
+		echo "devbox already installed."; \
+	fi
+
+asdf: xcode ## install asdf
+ifeq ($(UNAME), Darwin)
+	@if [ -z "${ASDF}" ]; then \
+		echo "Installing asdf..."; \
+		git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch ${ASDF_VERSION}; \
+		echo "To use asdf, add the following to your shell rc (.bashrc/.zshrc):"; \
+		echo "export PATH=\"$$HOME/.asdf/shims:$$PATH\""; \
+		echo ". $$HOME/.asdf/asdf.sh"; \
+		echo ". $$HOME/.asdf/completions/asdf.bash"; \
+	else \
+		echo "asdf already installed."; \
 	fi
 
 git: ## install git
@@ -125,16 +141,7 @@ pip: python ## install pip
 		echo "pip install not supported on os"; \
 	fi
 
-# * MULTIPASS START
-launch: ## launch a new instance of ubuntu
-	@echo "${YELLOW}Launching a new instance of ubuntu${RESET}"
-	multipass launch \
-		--name "${NAME}" "${IMAGE}" \
-		--cpus "${CPU}" \
-		--disk "${DISK}" \
-		--memory "${MEM}" \
-		--verbose \
-		--cloud-init ./cloud-config/cloud-init.ubuntu.yml
+install: xcode asdf brew devbox pre-commit task ## install dependencies
 
 list:
 	@echo "${YELLOW}Listing instances${RESET}"

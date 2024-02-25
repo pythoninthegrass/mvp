@@ -1,0 +1,29 @@
+{
+  "packages": [
+    "python@3.11.6",
+    "python311Packages.pip@latest",
+    "poetry@latest",
+    "docker@latest",
+    "gh@latest",
+    "git@latest",
+    "gnumake@latest",
+    "go-task@latest",
+    "heroku@latest",
+    "nodejs@21.4.0",
+    "openssl@latest",
+    "tilt@latest"
+  ],
+  "env": {
+    "VENV_DIR": ".venv"
+  },
+  "shell": {
+    "init_hook": [
+      ". $VENV_DIR/bin/activate",
+      "poetry install --no-root"
+    ],
+    "scripts": {
+      "start": "./startup.sh",
+      "test": "poetry run pytest"
+    }
+  }
+}
