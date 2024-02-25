@@ -6,6 +6,7 @@
     "EditorConfig.EditorConfig",
     "GitHub.copilot-chat",
     "GitHub.copilot",
+    "jetpack-io.devbox",
     "mads-hartmann.bash-ide-vscode",
     "ms-azuretools.vscode-docker",
     "ms-python.python",
