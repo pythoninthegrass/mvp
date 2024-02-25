@@ -1,0 +1,82 @@
+version: "3.0"
+
+set: ['e', 'u', 'pipefail']
+shopt: ['globstar']
+
+env:
+  BUILD: "{{.TASKFILE_DIR}}/bin/build.sh"
+  COMPOSE_FILE: "{{.TLD}}/docker-compose.yml"
+  DOCKERFILE: "{{.TLD}}/Dockerfile"
+  PLATFORM: "linux/amd64"
+
+tasks:
+  # TODO: list only the current taskfile tasks from parent taskfile
+  default:
+    desc: "Default task"
+    cmds:
+      - task --list
+
+  net:
+    desc: "Create docker network"
+    cmds:
+      - |
+        docker network create \
+        --driver bridge \
+        app-tier
+
+  vol:
+    desc: "Create docker volume"
+    cmds:
+      - |
+        docker volume create \
+        --driver local \
+        mvp-vol
+
+  build:
+    desc: "Build the docker image"
+    cmds:
+      - |
+        {{.BUILD}} build {{.DOCKERFILE}} {{.SERVICE}}
+
+  push:
+    desc: "Push the docker image to the registry"
+    deps:
+      - build
+    cmds:
+      - docker push {{.REGISTRY_URL}}/{{.USER_NAME}}/{{.SERVICE}}
+
+  up:
+    desc: "Start the project with docker compose"
+    cmds:
+      - |
+        docker compose -f {{.COMPOSE_FILE}} up -d \
+        --build \
+        --remove-orphans
+
+  exec:
+    desc: "Shell into a running container"
+    cmds:
+      - docker exec -it {{.SERVICE}} sh
+
+  logs:
+    desc: "Follow the logs of a running container"
+    cmds:
+      - docker compose logs -tf {{.SERVICE}}
+
+  stop:
+    desc: "Stop the project with docker compose"
+    cmds:
+      - docker compose -f {{.COMPOSE_FILE}} stop
+
+  down:
+    desc: "Stop and remove containers, networks, and volumes with docker compose"
+    cmds:
+      - |
+        docker compose -f {{.COMPOSE_FILE}} down \
+        --volumes
+
+  prune:
+    desc: "Prune docker"
+    cmds:
+      - docker system prune --all --force
+      - docker builder prune --all --force

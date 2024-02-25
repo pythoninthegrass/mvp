@@ -1,0 +1,85 @@
+version: "3.0"
+
+set: ['e', 'u', 'pipefail']
+shopt: ['globstar']
+
+dotenv: ['./app/.env']
+
+env:
+  TLD:
+    sh: "echo {{.TASKFILE_DIR}}"            # absolute path
+    # sh: "basename ${{.TASKFILE_DIR}}"     # directory name
+  APP:
+    sh: echo "${APP_NAME:-mvp}"
+  POETRY:
+    sh: "echo ${POETRY:-1.7.1}"
+  PY_VER:
+    sh: "echo ${PY_VER:-3.11.6}"
+  SCRIPT:
+  UNAME:
+    sh: "uname -s"
+
+vars:
+
+includes:
+  docker:
+    taskfile: ./tasks/docker.yml
+    aliases: ["docker"]
+
+tasks:
+  print:
+    - |
+      echo -e "TLD:\t\t$TLD"
+      echo -e "APP:\t\t{{.APP}}"
+      echo -e "BUILD:\t\t{{.BUILD}}"
+      echo -e "COMPOSE_FILE:\t{{.COMPOSE_FILE}}"
+      echo -e "DOCKERFILE:\t{{.DOCKERFILE}}"
+      echo -e "PLATFORM:\t{{.PLATFORM}}"
+      echo -e "POETRY:\t\t{{.POETRY}}"
+      echo -e "PY_VER:\t\t{{.PY_VER}}"
+      echo -e "SCRIPT:\t\t{{.SCRIPT}}"
+      echo -e "REGISTRY:\t$REGISTRY"
+      echo -e "SERVICE:\t{{.SERVICE}}"
+      echo -e "TAG:\t\t${TAG}"
+      echo -e "USER_NAME:\t$USER_NAME"
+      echo -e "UNAME:\t\t$UNAME"
+
+  default:
+    desc: "Default task"
+    cmds:
+      - task --list
+
+  install:
+    desc: "Install project dependencies"
+    cmds:
+      - |
+        {{.INSTALL}} {{.CLI_ARGS}}
+
+  pre-commit:
+    desc: "Run pre-commit hooks"
+    cmds:
+      - pre-commit run --all-files
+
+  checkbash:
+    desc: "Check bash scripts"
+    cmds:
+      - checkbashism -x {{.TLD}}/app/*.sh
+
+  update-deps:
+    desc: "Update dependencies"
+    cmds:
+      - |
+        poetry cache clear --all pypi --no-ansi
+        poetry update --lock --no-ansi
+
+  export-reqs:
+    desc: "Export requirements.txt"
+    summary: |
+      Export the project dependencies to a requirements.txt file.
+    cmds:
+      - |
+        poetry export -f requirements.txt \
+          --output {{.TLD}}/requirements.txt \
+          --without-hashes \
+          --no-ansi
+    ignore_error: true
