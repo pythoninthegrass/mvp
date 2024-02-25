@@ -41,6 +41,26 @@
         }
       }
     },
+    "asdf-vm@latest": {
+      "last_modified": "2024-02-10T18:15:24Z",
+      "resolved": "github:NixOS/nixpkgs/10b813040df67c4039086db0f6eaf65c536886c6#asdf-vm",
+      "source": "devbox-search",
+      "version": "0.14.0",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/mara9fb0rgzk790q16hm3mwzpxwcmzz8-asdf-vm-0.14.0"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/h5ibj29ng73xlb77firx7sajdajl1lcf-asdf-vm-0.14.0"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/y4l8am760v9r19xr1scyqf2rxxfmkwy9-asdf-vm-0.14.0"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/h35fi5106nzvhd87kzrz1sg7whajzswz-asdf-vm-0.14.0"
+        }
+      }
+    },
     "docker@latest": {
       "last_modified": "2024-02-01T15:59:28Z",
       "resolved": "github:NixOS/nixpkgs/f38bca1ca559974b36863d0ff4bb710b7bc12890#docker",

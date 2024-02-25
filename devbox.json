@@ -6,6 +6,7 @@
     "docker@latest",
     "ansible@latest",
     "ansible-lint@latest",
+    "asdf-vm@latest",
     "gh@latest",
     "git@latest",
     "gnumake@latest",
