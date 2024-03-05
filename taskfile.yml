@@ -25,6 +25,9 @@ includes:
   docker:
     taskfile: ./tasks/docker.yml
     aliases: ["docker"]
+  poetry:
+    taskfile: ./tasks/poetry.yml
+    aliases: ["poetry"]
 
 tasks:
   print:
