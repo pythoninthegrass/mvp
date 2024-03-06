@@ -30,6 +30,7 @@ tasks:
             echo "Invalid repository"
             ;;
         esac
+    run: once
     silent: true
 
   build:
@@ -42,10 +43,27 @@ tasks:
     cmds:
       - poetry install --no-ansi
 
-  bump-version:
-    desc: "Bump the project version for alpha releases"
+  bump-semver:
+    desc: "Bump the project semantic version"
     cmds:
-      - poetry version prerelease --no-ansi
+      - |
+        case {{.CLI_ARGS}} in
+          "major")
+            poetry version major --no-ansi
+            ;;
+          "minor")
+            poetry version minor --no-ansi
+            ;;
+          "patch")
+            poetry version patch --no-ansi
+            ;;
+          "prerelease")
+            poetry version prerelease --no-ansi
+            ;;
+          *|"")
+            echo "Invalid version"
+            ;;
+        esac
 
   publish:
     desc: "Publish the poetry bin"
@@ -88,5 +106,3 @@ tasks:
           --without-hashes \
           --no-ansi
     ignore_error: true
-
-
