@@ -8,6 +8,7 @@
   "service": "app",
   "workspaceFolder": "/app",
   "dockerComposeFile": "../docker-compose.yml",
+  "overrideCommand": true,
   "shutdownAction": "stopCompose",
   "customizations": {
     "vscode": {
