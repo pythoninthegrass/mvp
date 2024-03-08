@@ -7,8 +7,7 @@ dotenv: ['./app/.env']
 
 env:
   TLD:
-    sh: "echo {{.TASKFILE_DIR}}"            # absolute path
-    # sh: "basename ${{.TASKFILE_DIR}}"     # directory name
+    sh: git rev-parse --show-toplevel
   APP:
     sh: echo "${APP_NAME:-mvp}"
   POETRY:
