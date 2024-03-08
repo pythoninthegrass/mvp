@@ -3,7 +3,7 @@ version: "3.0"
 set: ['e', 'u', 'pipefail']
 shopt: ['globstar']
 
-dotenv: ['./app/.env']
+dotenv: ['.env']
 
 env:
   TLD:
