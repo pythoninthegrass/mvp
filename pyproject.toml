@@ -4,6 +4,7 @@ version = "1.0.0"
 description = ""
 authors = ["pythoninthegrass <4097471+pythoninthegrass@users.noreply.github.com>"]
 license = "Unlicense"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
