@@ -3,12 +3,13 @@
     "editor.insertSpaces": true,
     "editor.tabSize": 4,
   },
-    "python.testing.pytestArgs": [
-        "."
-    ],
-    // https://github.com/astral-sh/ruff-vscode
-    "python.analysis.ignore": [
-      "*"
-    ],
-    "ansible.python.interpreterPath": "/Users/lance/.asdf/shims/python",
+  "python.testing.pytestArgs": [
+    "tests"
+  ],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  // https://github.com/astral-sh/ruff-vscode
+  "python.analysis.ignore": [
+    "*"
+  ]
 }
