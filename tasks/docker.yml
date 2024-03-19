@@ -4,7 +4,7 @@ set: ['e', 'u', 'pipefail']
 shopt: ['globstar']
 
 env:
-  BUILD: "{{.TASKFILE_DIR}}/bin/build.sh"
+  BUILD: "{{.TLD}}/bin/build.sh"
   COMPOSE_FILE: "{{.TLD}}/docker-compose.yml"
   DOCKERFILE: "{{.TLD}}/Dockerfile"
   PLATFORM: "linux/amd64"
