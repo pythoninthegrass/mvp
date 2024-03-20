@@ -38,9 +38,20 @@ tasks:
       - |
         {{.BUILD}} build {{.DOCKERFILE}} {{.SERVICE}}
 
+  login:
+    desc: "Login to the container registry"
+    cmds:
+      - |
+        docker login \
+          -u {{.USER_NAME}} \
+          -p {{.REGISTRY_PASS}} {{.REGISTRY_URL}}
+    run: once
+    silent: true
+
   push:
     desc: "Push the docker image to the registry"
     deps:
+      - login
       - build
     cmds:
       - docker push {{.REGISTRY_URL}}/{{.USER_NAME}}/{{.SERVICE}}
