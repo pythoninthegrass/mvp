@@ -42,9 +42,9 @@ tasks:
     desc: "Login to the container registry"
     cmds:
       - |
-        docker login \
+        echo "{{.REGISTRY_PASS}}" | docker login \
           -u {{.USER_NAME}} \
-          -p {{.REGISTRY_PASS}} {{.REGISTRY_URL}}
+          --password-stdin {{.REGISTRY_URL}}
     run: once
     silent: true
 
