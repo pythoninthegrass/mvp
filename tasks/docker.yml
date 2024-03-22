@@ -10,12 +10,6 @@ env:
   PLATFORM: "linux/amd64"
 
 tasks:
-  # TODO: list only the current taskfile tasks from parent taskfile
-  default:
-    desc: "Default task"
-    cmds:
-      - task --list
-
   net:
     desc: "Create docker network"
     cmds:
