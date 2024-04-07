@@ -2,6 +2,7 @@
   "[python]": {
     "editor.insertSpaces": true,
     "editor.tabSize": 4,
+    "editor.defaultFormatter": "charliermarsh.ruff"
   },
   "python.testing.pytestArgs": [
     "tests"
@@ -11,5 +12,8 @@
   // https://github.com/astral-sh/ruff-vscode
   "python.analysis.ignore": [
     "*"
-  ]
+  ],
+  "ruff.lint.run": "onType",
+  "ruff.organizeImports": true,
+  "ruff.showNotifications": "onError"
 }
