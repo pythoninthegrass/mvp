@@ -22,10 +22,10 @@ vars:
 
 includes:
   docker:
-    taskfile: ./tasks/docker.yml
+    taskfile: ./taskfiles/docker.yml
     aliases: ["docker"]
   poetry:
-    taskfile: ./tasks/poetry.yml
+    taskfile: ./taskfiles/poetry.yml
     aliases: ["poetry"]
 
 tasks:
