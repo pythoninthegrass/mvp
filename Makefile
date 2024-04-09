@@ -94,7 +94,25 @@ git: ## install git
 		echo "Uncaught error"; \
 	fi
 
-pre-commit: ## install pre-commit
+python: ## install python
+	if [ "${UNAME}" = "Darwin" ] && [ -n "${BREW}" ]; then \
+		brew install python; \
+	elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "debian" ]; then \
+		sudo apt install -y python3; \
+	else \
+		echo "Uncaught error"; \
+	fi
+
+pip: python ## install pip
+	if [ "${UNAME}" = "Darwin" ] && [ -n "${BREW}" ]; then \
+		brew install pip; \
+	elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "debian" ]; then \
+		sudo apt install -y python3-pip; \
+	else \
+		echo "Uncaught error"; \
+	fi
+
+pre-commit: pip ## install pre-commit
 	@if [ -n "${PRE_COMMIT}" ]; then \
 		echo "pre-commit already installed."; \
 		exit 0; \
