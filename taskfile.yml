@@ -71,8 +71,7 @@ tasks:
     desc: "Update dependencies"
     cmds:
       - |
-        poetry cache clear --all pypi --no-ansi
-        poetry up 2>/dev/null
+        poetry run poetry up 2>/dev/null
         poetry update --lock --no-ansi
 
   export-reqs:
