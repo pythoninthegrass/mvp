@@ -90,7 +90,7 @@ tasks:
     desc: "Run the playbook"
     cmds:
       - |
-        if [[ -z {{.ARGS}} ]]; then
+        if [[ -n {{.ARGS}} ]]; then
           ansible-playbook \
             -i ./ansible/hosts \
             {{.ARGS}}
