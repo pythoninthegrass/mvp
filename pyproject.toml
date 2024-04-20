@@ -22,7 +22,7 @@ pytest-cov = "^4.1.0"
 pytest-datafiles = "^3.0.0"
 pytest-xdist = "^3.5.0"
 rich = "^13.7.1"
-ruff = "^0.1.5"
+ruff = "^0.4.1"
 
 [tool.ruff]
 # Allow autofix for all enabled rules (when `--fix`) is provided.
