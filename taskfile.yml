@@ -62,6 +62,16 @@ tasks:
     cmds:
       - pre-commit run --all-files
 
+  lint:
+    desc: "Run linters"
+    cmds:
+      - poetry run ruff check --fix --respect-gitignore
+
+  format:
+    desc: "Run formatters"
+    cmds:
+      - poetry run ruff format --respect-gitignore
+
   checkbash:
     desc: "Check bash scripts"
     cmds:
