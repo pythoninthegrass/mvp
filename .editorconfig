@@ -29,6 +29,6 @@ indent_style = space
 indent_size = 4
 
 # webdev et al
-[*.{html,xml,js,css,json,gql,lua,tf,tfvars,yml,yaml}]
+[*.{html,xml,js,css,json,jsonc,gql,lua,tf,tfvars,yml,yaml}]
 indent_style = space
 indent_size = 2
