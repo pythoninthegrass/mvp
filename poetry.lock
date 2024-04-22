@@ -1198,6 +1198,17 @@ files = [
 tests = ["pytest"]
 
 [[package]]
+name = "pyclean"
+version = "3.0.0"
+description = "Pure Python cross-platform pyclean. Clean up your Python bytecode."
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "pyclean-3.0.0-py3-none-any.whl", hash = "sha256:a1d8114991cf09994bc511cd0b050f3e398ae2bc8bfc0bbd1bdbec8ba048e6dd"},
+    {file = "pyclean-3.0.0.tar.gz", hash = "sha256:a48be7afd512b1923a7b9decc1219bbbe2d73199c939b46c936448f904a180ce"},
+]
+
+[[package]]
 name = "pycparser"
 version = "2.22"
 description = "C parser in Python"
@@ -1770,4 +1781,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.13"
-content-hash = "d85f620693dc0f3cddac54468698ec3a099f451ccb5d96b82bedd068ae02f72d"
+content-hash = "dc4cd0efb444612d89c080234cf8a3e092dc5a71f50204380e378280faa3fc41"

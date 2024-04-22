@@ -72,49 +72,31 @@ tasks:
     cmds:
       - poetry run ruff format --respect-gitignore
 
+  test:
+    desc: "Run tests"
+    cmds:
+      - poetry run pytest
+
+  pyclean:
+    desc: "Remove .pyc and __pycache__"
+    cmds:
+      - |
+        args=(
+          .
+          --debris
+          --verbose
+          -i .devbox
+        )
+        case "{{.CLI_ARGS}}" in
+          dry-run)
+            poetry run pyclean "${args[@]}" --dry-run
+            ;;
+          *)
+            poetry run pyclean "${args[@]}"
+            ;;
+        esac
+
   checkbash:
     desc: "Check bash scripts"
     cmds:
       - checkbashism -x {{.TLD}}/app/*.sh
-
-  update-deps:
-    desc: "Update dependencies"
-    cmds:
-      - |
-        poetry run poetry up 2>/dev/null
-        poetry update --lock --no-ansi
-
-  export-reqs:
-    desc: "Export requirements.txt"
-    summary: |
-      Export the project dependencies to a requirements.txt file.
-    cmds:
-      - |
-        poetry export -f requirements.txt \
-          --output {{.TLD}}/requirements.txt \
-          --without-hashes \
-          --no-ansi
-    ignore_error: true
-
-  run:
-    desc: "Run the playbook"
-    cmds:
-      - |
-        if [[ -n {{.ARGS}} ]]; then
-          ansible-playbook \
-            -i ./ansible/hosts \
-            {{.ARGS}}
-        else
-          ansible-playbook \
-            -i ./ansible/hosts \
-            ./ansible/playbook.yml
-        fi
-
-  run-dev:
-    desc: "Run the playbook with tags and debug"
-    cmds:
-      - |
-        ansible-playbook \
-          -i ./ansible/hosts \
-          {{.ARGS}} \
-          --tags test,qa -vvv
