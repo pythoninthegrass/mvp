@@ -2,7 +2,6 @@
   "packages": [
     "python@3.11.6",
     "python311Packages.pip@latest",
-    "poetry@latest",
     "ansible-lint@latest",
     "ansible@latest",
     "asdf-vm@latest",
@@ -11,9 +10,9 @@
     "git@latest",
     "gnumake@latest",
     "go-task@latest",
-    "minikube@latest",
     "nodejs@21.4.0",
     "openssl@latest",
+    "poetry@latest",
     "tilt@latest"
   ],
   "env": {
