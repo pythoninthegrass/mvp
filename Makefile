@@ -23,7 +23,12 @@ export BREW := $(shell command -v brew 2>/dev/null)
 export DEVBOX := $(shell command -v devbox 2>/dev/null)
 export GIT := $(shell command -v git 2>/dev/null)
 export PRE_COMMIT := $(shell command -v pre-commit 2>/dev/null)
-export TASK := $(shell command -v task 2>/dev/null)
+export PYTHON := $(shell command -v python 2>/dev/null)
+ifeq ($(ID_LIKE), debian)
+	export TASK := $(shell command -v task 2>/dev/null)
+else ifeq ($(ID_LIKE), fedora)
+	export TASK := $(shell command -v go-task 2>/dev/null)
+endif
 
 # colors
 GREEN := $(shell tput -Txterm setaf 2)
@@ -40,7 +45,9 @@ define install_package
 	if [ "${UNAME}" = "Darwin" ] && [ -n "${BREW}" ]; then \
 		brew install $(1) --quiet; \
 	elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "debian" ]; then \
-		sudo apt install -y $(1); \
+		sudo apt-get install -y -qq $(1); \
+	elif [ "${ID_LIKE}" = "fedora" ]; then \
+		sudo dnf install -y --quiet $(1); \
 	else \
 		echo "Uncaught error"; \
 	fi
@@ -100,18 +107,22 @@ git: ## install git
 	@$(call install_package,git)
 
 python: ## install python
-	@if [ "${UNAME}" = "Darwin" ] && [ -n "${BREW}" ]; then \
-		$(call install_package,python@${PYTHON_VERSION}) \
-	elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "debian" ]; then \
-		$(call install_package,python3) \
+	@if [ -n "${PYTHON}" ]; then \
+		echo "python already installed."; \
 	else \
-		echo "Uncaught error"; \
+		if [ "${UNAME}" = "Darwin" ] && [ -n "${BREW}" ]; then \
+			$(call install_package,python@${PYTHON_VERSION}) \
+		elif [ "${ID_LIKE}" = "fedora" ] || [ "${ID_LIKE}" = "debian" ]; then \
+			$(call install_package,python3) \
+		else \
+			echo "Uncaught error"; \
+		fi
 	fi
 
 pip: python ## install pip
 	@if [ "${UNAME}" = "Darwin" ] && [ -n "${BREW}" ]; then \
 		echo "pip is already installed via the python brew package"; \
-	elif [ "${ID}" = "ubuntu" ] || [ "${ID_LIKE}" = "debian" ]; then \
+	elif [ "${ID_LIKE}" = "fedora" ] || [ "${ID_LIKE}" = "debian" ]; then \
 		$(call install_package,python3-pip) \
 	else \
 		echo "Uncaught error"; \
@@ -127,11 +138,18 @@ pre-commit: pip ## install pre-commit
 	fi
 
 task: ## install taskfile
-	@if [ -z "${TASK}" ]; then \
-		echo "Installing taskfile..."; \
-		$(call install_package,go-task); \
-	else \
+	@if [ -n "${TASK}" ]; then \
 		echo "taskfile already installed."; \
+	else \
+		if [ "${ID_LIKE}" = "debian" ]; then \
+			echo "Installing taskfile..."; \
+			$(call install_package,task); \
+		elif [ "${UNAME}" = "Darwin" ] || [ "${ID_LIKE}" = "fedora" ]; then \
+			echo "Installing taskfile..."; \
+			$(call install_package,go-task); \
+		else \
+			echo "taskfile not supported."; \
+		fi \
 	fi
 
 install: xcode asdf brew devbox pre-commit task ## install dependencies
