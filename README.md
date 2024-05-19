@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD022 MD031 MD036 MD032 -->
 # mvp
 
 <!-- !["It's dangerous to go alone! Take this."](static/image.jpg) -->
@@ -24,7 +25,7 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
 
 ## Setup
 ### Minimum requirements
-  * [Python 3.11](https://www.python.org/downloads/)
+* [Python 3.11](https://www.python.org/downloads/)
 * Dev dependencies
   * make
     * [Linux](https://www.gnu.org/software/make/)
