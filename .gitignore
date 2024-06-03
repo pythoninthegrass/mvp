@@ -1,9 +1,13 @@
 # ETC
 *.sqlite
-!*.example
 *.pem
+**/facts/
 .ruff*
 tilt-example-python/
+
+# INCLUDE
+!**/.gitkeep
+!**/*.example
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
