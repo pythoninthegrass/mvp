@@ -1,0 +1,18 @@
+{
+  "v1": {
+    "distro": "ubuntu",
+    "distro_release": "jammy",
+    "distro_version": "22.04",
+    "instance_id": "",
+    "machine": "x86_64",
+    "platform": "",
+    "region": "",
+    "local_hostname": "ubuntu",
+    "public_ssh_keys": [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDFnt3zU50NcdNvO37qPwqsXtD1lZ9Ka0bb8io5HO+8lE24ZnQ7GEWbf3VU3sKQqj6O0Itupz3n1NZoq0YOxW4TNwiAiYi4MBwBjoQ5ALkzoj/DthrsfoiQtd7MXsfIfDp4tp6ktxC3DtgON461L0r55KQVXdARc92R4iEsoCXnZtT2s7cDIZcbRIW13yiB3gBoazOsTH7vLHiPS61YkKd0Ih5zpc+xgHmLUe/iR7Qazy3nZ/OwTOlEh2nxzACHhFDKz38WiwfJtnoIlsmJaow3Cq56onRJeuOqbSGS9fETkumGXAVuJkkyCcjBbthvWGlfMsa1gAI9fmMphYAzfYq5ZrTur+Npy+ycunkkOJeFhkKqPA/GC9L3ogS4/k8JZTpVdLhqQmAoANiIXiKWMn1rleT5q+EgX/S4Q7n1szM8jLZRFH8tr0sKxVC+qUxTbylaJk7j4b3juS3iZQAERAwGGP3sG5wrFtvZjFABEINuGC/ijisGupca0p+7cEFb0ECLFZ5dMqguGuHnnF1YIBj/O0iTT18+uiJl3RrZ6v2EkKQIlKMy4A7fpeMnrbuHS9TcdtRPwBhRacyCUX2mhVz6hxqy9WZ2sU6uXzuXI8PHwWptk89/avWwLFzk0l1TrzFEdJNRzo5qE/ZisobQaZt67R74zS+ngsmWE+/Vcm3Oyw== lance@pythoninthegrass"
+    ],
+    "python_version": "3.11.6",
+    "userdata": "ubuntu",
+    "variant": "ubuntu"
+  }
+}

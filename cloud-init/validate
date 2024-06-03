@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -e
+
+help() {
+	cat <<- DESCRIPTION >&2
+	Shim to run cloud-init schema validation in a container.
+
+	SETUP
+	    docker build -t cloud-init .
+
+	USAGE
+	    $(basename "$0") /path/to/cloud_init.yml
+	DESCRIPTION
+}
+
+if [ "$#" -ne 1 ]; then
+	help
+	exit 1
+fi
+
+CLOUD_INIT_FILE=$(realpath "$1")
+
+docker run --rm \
+	-v "${CLOUD_INIT_FILE}:/app/cloud_init.yml" \
+	cloud-init \
+	devel schema --config-file /app/cloud_init.yml

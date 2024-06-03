@@ -1,4 +1,5 @@
 #cloud-config
+# vim: syntax=yaml
 
 output: {all: '| tee -a /var/log/cloud-init.log'}   # store logs inside vm
 
@@ -6,8 +7,9 @@ timezone: "America/Chicago"
 
 hostname: ubuntu
 
-package_update: true
-package_upgrade: true
+package_update: true      # default: true
+package_upgrade: false    # default: false  # TODO: set to true
+# https://github.com/number5/cloud-init/blob/main/doc/examples/cloud-config-apt.txt#L21
 apt_get_command: ["apt-get", "--option=Dpkg::Options::=--force-confold", "--option=Dpkg::options::=--force-unsafe-io", "--assume-yes", "--quiet", "--no-install-recommends"]
 
 apt:
@@ -21,28 +23,24 @@ apt:
 
 packages:
   - ansible
-  - ansible-lint
   - apt-transport-https
+  - bats
+  - build-essential
   - ca-certificates
   - cloud-init
-  - containerd.io
   - curl
-  - dnsutils
   - docker-ce
   - docker-ce-cli
-  - git
+  - containerd.io
   - gnupg-agent
-  - inxi
-  - make
   - net-tools
-  - p7zip-full
-  - python3.11
-  - python3.11-venv
+  - python3
+  - python3-pip
+  - redis
+  - redis-server
   - software-properties-common
-  - tldr
   - tree
   - vim
-  - wget
 
 groups:
   - docker
@@ -52,40 +50,48 @@ system_info:
     groups: [docker]
 
 users:
-  - name: ubuntu
-    shell: /bin/bash
-    groups: [admin, users, wheel]
-    ssh_import_id: None
-    lock_passwd: true
-    sudo: ALL=(ALL) NOPASSWD:ALL
-
   - name: ansible
-    shell: /bin/bash
+    plain_text_passwd: 'ansible'
+    sudo: [ALL=(ALL) NOPASSWD:ALL]
+    gecos: Ansible
+    home: /home/ansible
     groups: [admin, users, wheel]
-    ssh_import_id: None
     lock_passwd: true
-    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    no_ssh_fingerprints: true
 
 runcmd:
-  - curl -s https://github.com/pythoninthegrass.keys >> /home/ubuntu/.ssh/authorized_keys
-  - git clone https://github.com/pythoninthegrass/mvp.git /home/ubuntu/git/mvp
-  - chown -R ubuntu:ubuntu /home/ubuntu/git/mvp
-  - touch /var/log/ansible.log
+  - systemctl enable --now qemu-guest-agent.service
+  - systemctl enable --now docker
+  - systemctl enable --now redis-server
+  - runuser -l ubuntu -c "wget -O - https://github.com/pythoninthegrass.keys | sudo tee -a ~/.ssh/authorized_keys"
+  - runuser -l ubuntu -c "ssh-keyscan github.com >> ~/.ssh/known_hosts"
+  - runuser -l ubuntu -c "mkdir -p /home/ubuntu/git"
+  - runuser -l ubuntu -c "sudo chmod -R 0777 /home/ubuntu/git"
+  - runuser -l ubuntu -c "sudo chown -R ubuntu:ubuntu /home/ubuntu/git"
+  - runuser -l ansible -c "sudo touch /var/log/ansible.log"
   - runuser -l ansible -c "sudo chown ansible:ansible /var/log/ansible.log"
   - runuser -l ansible -c "sudo chmod 0777 /var/log/ansible.log"
+  # * smoke test
+  # - ansible all -m ping -i /etc/ansible/hosts
+
+ssh:
+  emit_keys_to_console: false
+
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDIUQ//QOZBVOyG9ieqMG2vVVP7KMI0B9DIyXE4PioCTaw1P2/oGRcqr0pAmqrxtO7ADNcFSwW5hdAr9L4KGc+CUns/nZ16M1fhfuW6tVnYGaSgwGYCIU1DCJ+ofvdWJOkAAmvui9w6g5VgwxdC2V27lITgy57E9XwO16diywrKMT9M5sypX51nVQOgeDJR8fO8LaT0kWuBtOtOuFNaZzD0eHiciojM95alIbJthCT10fvTGVOQGdODzIuKlVQjIqOZ78qFNB0E9rfeTuLgdZ5CRrFqkDfaCYMwgNWmzBt3YnomnhndpuqwftRdOoNi2FmJegZDp5prDOTisfB6r4TJriWq165hF9M8RKOqyyq0C0+h7+UXlhhZk4WWEOVsSTAx2MlFMdk9UrOMdqq2dqFZfaWSPRvM8m8JugTXloYhoK/nderzTa2qoKJCZadJG+ul+wQJpS/dqItnGowcO7mgFSsxMhuCJbxWjFpjwvZkVBLl60f9l2FU1/515onFwz0= lance.stephens@mbp.local
 
 write_files:
   - path: /home/ubuntu/.bashrc
     owner: ubuntu:ubuntu
     permissions: '0644'
-    defer: true
     append: false
     content: |
       # Verify that shell is interactive
       if [[ $- != *i* ]]; then return; fi
 
       alias update='sudo apt update && sudo apt upgrade -y && sudo apt dist-upgrade -y && sudo apt autoremove -y && sudo apt auto-clean'
-      alias python='python3.11'
+      alias python='python3'
       alias ll='ls -FGlAhp'
       alias mkdir='mkdir -pv'
       alias ..='cd ../'
@@ -127,13 +133,11 @@ write_files:
 
   - path: /home/ubuntu/.bash_profile
     owner: ubuntu:ubuntu
-    defer: true
     content: |
       [[ -s ~/.bashrc ]] && source ~/.bashrc
 
   - path: /home/ubuntu/.gitignore
     owner: ubuntu:ubuntu
-    defer: true
     content: |
       .env
       .gitattributes
@@ -146,7 +150,6 @@ write_files:
 
   - path: /home/ubuntu/.gitconfig
     owner: ubuntu:ubuntu
-    defer: true
     content: |
       [core]
         excludesfile = /home/ubuntu/.gitignore
@@ -155,10 +158,11 @@ write_files:
         name = pythoninthegrass
       [pull]
         rebase = true
+      [safe]
+        directory = /etc/ansible/roles/hardening
 
   - path: /etc/ansible/hosts
     owner: ansible:ansible
-    defer: true
     content: |
       [all]
       localhost ansible_connection=local
@@ -171,16 +175,17 @@ write_files:
 
   - path: /etc/ansible/ansible.cfg
     owner: ansible:ansible
-    defer: true
     content: |
       [defaults]
-      log_path                    = /var/log/ansible.log
-      host_key_checking           = False
-      retry_files_enabled          = False
-      remote_tmp                  = /tmp/${USER}/ansible
-      gathering                   = smart
-      fact_caching                = jsonfile
-      fact_caching_connection     = /tmp/${USER}/facts
+      log_path                = /var/log/ansible.log
+      host_key_checking       = False
+      retry_files_enabled      = False
+      remote_tmp              = /tmp/${USER}/ansible
+      gathering               = smart
+      fact_caching            = redis
+      fact_caching_prefix      = ansible_facts_
+      fact_caching_timeout    = 60
+      fact_caching_connection = localhost:6379:0
 
   - path: /etc/netplan/50-cloud-init.yaml
     owner: root:root
@@ -218,6 +223,18 @@ write_files:
         ],
         "hosts": ["tcp://0.0.0.0:2375", "unix:///var/run/docker.sock"]
       }
+
+# TODO: QA
+ansible:
+  ansible_config: |
+    [defaults]
+    log_path                = /var/log/ansible.log
+    fact_caching            = memory
+  install_method: distro
+  package_name: ansible
+  pull:
+    url: "https://github.com/pythoninthegrass/multipass_poc.git"
+    playbook_name: "tasks/git.yml"
 
 bootcmd:
   - printf "[Resolve]\nDNS=1.1.1.1" > /etc/systemd/resolved.conf

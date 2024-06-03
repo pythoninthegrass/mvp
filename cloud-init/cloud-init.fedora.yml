@@ -1,0 +1,218 @@
+#cloud-config
+
+package_update: true      # default: true
+package_upgrade: false    # default: false  # TODO: set to true
+
+packages:
+  - ansible
+  - bats
+  - ca-certificates
+  - cloud-init
+  - dnf-plugins-core
+  - python3
+  - qemu-guest-agent
+  - tree
+  - vim
+
+groups:
+  - docker
+
+system_info:
+  default_user:
+    groups: [docker]
+
+users:
+  - name: fedora
+    plain_text_passwd: 'fedora'
+    sudo: [ALL=(ALL) NOPASSWD:ALL]
+    chpasswd: { expire: False }
+    ssh_pwauth: True
+    gecos: Fedora
+    home: /home/fedora
+    groups: [admin, users, sudo, wheel, docker]
+    lock_passwd: true
+    shell: /bin/bash
+    no_ssh_fingerprints: true
+  - name: ansible
+    plain_text_passwd: 'ansible'
+    sudo: [ALL=(ALL) NOPASSWD:ALL]
+    gecos: Ansible
+    home: /home/ansible
+    groups: [admin, users, sudo, wheel]
+    lock_passwd: true
+    shell: /bin/bash
+    no_ssh_fingerprints: true
+
+runcmd:
+  - systemctl enable --now qemu-guest-agent.service
+  - dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+  - dnf install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+  - systemctl enable --now docker
+  - dnf config-manager --add-repo https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
+  - dnf install terraform -y
+  - su fedora -c "wget -O - https://github.com/pythoninthegrass.keys | sudo tee -a ~/.ssh/authorized_keys"
+  - su fedora -c "ssh-keyscan github.com >> ~/.ssh/known_hosts"
+  - su fedora -c "mkdir -p /home/fedora/git"
+  - su fedora -c "sudo chmod -R 0777 /home/fedora/git"
+  - su fedora -c "sudo chown -R fedora:fedora /home/fedora/git"
+  - su ansible -c "sudo touch /var/log/ansible.log"
+  - su ansible -c "sudo chown ansible:ansible /var/log/ansible.log"
+  - su ansible -c "sudo chmod 0777 /var/log/ansible.log"
+  # * smoke test
+  # - ansible all -m ping -i /etc/ansible/hosts
+
+ssh:
+  emit_keys_to_console: false
+
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDFnt3zU50NcdNvO37qPwqsXtD1lZ9Ka0bb8io5HO+8lE24ZnQ7GEWbf3VU3sKQqj6O0Itupz3n1NZoq0YOxW4TNwiAiYi4MBwBjoQ5ALkzoj/DthrsfoiQtd7MXsfIfDp4tp6ktxC3DtgON461L0r55KQVXdARc92R4iEsoCXnZtT2s7cDIZcbRIW13yiB3gBoazOsTH7vLHiPS61YkKd0Ih5zpc+xgHmLUe/iR7Qazy3nZ/OwTOlEh2nxzACHhFDKz38WiwfJtnoIlsmJaow3Cq56onRJeuOqbSGS9fETkumGXAVuJkkyCcjBbthvWGlfMsa1gAI9fmMphYAzfYq5ZrTur+Npy+ycunkkOJeFhkKqPA/GC9L3ogS4/k8JZTpVdLhqQmAoANiIXiKWMn1rleT5q+EgX/S4Q7n1szM8jLZRFH8tr0sKxVC+qUxTbylaJk7j4b3juS3iZQAERAwGGP3sG5wrFtvZjFABEINuGC/ijisGupca0p+7cEFb0ECLFZ5dMqguGuHnnF1YIBj/O0iTT18+uiJl3RrZ6v2EkKQIlKMy4A7fpeMnrbuHS9TcdtRPwBhRacyCUX2mhVz6hxqy9WZ2sU6uXzuXI8PHwWptk89/avWwLFzk0l1TrzFEdJNRzo5qE/ZisobQaZt67R74zS+ngsmWE+/Vcm3Oyw== lance@pythoninthegrass
+
+write_files:
+  - path: /home/fedora/.bashrc
+    owner: ubuntu:ubuntu
+    permissions: '0644'
+    append: false
+    content: |
+      # Verify that shell is interactive
+      if [[ $- != *i* ]]; then return; fi
+
+      alias update='sudo apt update && sudo apt upgrade -y && sudo apt dist-upgrade -y && sudo apt autoremove -y && sudo apt auto-clean'
+      alias python='python3'
+      alias ll='ls -FGlAhp'
+      alias mkdir='mkdir -pv'
+      alias ..='cd ../'
+      alias ...='cd ../../'
+      cd() { builtin cd "$@"; ll; }
+
+      HISTCONTROL=ignoreboth
+      shopt -s histappend
+      HISTSIZE=1000
+      HISTFILESIZE=2000
+
+      # Forward search in bash (step forward via ctrl-s)
+      stty -ixon
+
+      shopt -s checkwinsize
+
+      if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+          debian_chroot=$(cat /etc/debian_chroot)
+      fi
+
+      case "$TERM" in
+        xterm-color|*-256color) color_prompt=yes;;
+      esac
+
+      if [ "$color_prompt" = yes ]; then
+          PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] \nλ '
+      else
+          PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w \nλ '
+      fi
+      unset color_prompt force_color_prompt
+
+      case "$TERM" in
+      xterm*|rxvt*)
+          PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+          ;;
+      *)
+          ;;
+      esac
+
+  - path: /home/fedora/.bash_profile
+    owner: ubuntu:ubuntu
+    content: |
+      [[ -s ~/.bashrc ]] && source ~/.bashrc
+
+  - path: /home/fedora/.gitignore
+    owner: ubuntu:ubuntu
+    content: |
+      .env
+      .gitattributes
+      .venv
+      *.bak
+      **/scratch*
+      creds/
+      service_account.json
+      settings.ini
+
+  - path: /home/fedora/.gitconfig
+    owner: ubuntu:ubuntu
+    content: |
+      [core]
+        excludesfile = /home/fedora/.gitignore
+      [user]
+        email = 4097471+pythoninthegrass@users.noreply.github.com
+        name = pythoninthegrass
+      [pull]
+        rebase = true
+      [safe]
+        directory = /etc/ansible/roles/hardening
+
+  - path: /etc/ansible/hosts
+    owner: ansible:ansible
+    content: |
+      [all]
+      localhost ansible_connection=local
+
+      [all:vars]
+      ansible_user=ansible
+      ansible_become=yes
+      ansible_become_method=sudo
+      ansible_python_interpreter=/usr/bin/python3
+
+  - path: /etc/ansible/ansible.cfg
+    owner: ansible:ansible
+    content: |
+      [defaults]
+      log_path                = /var/log/ansible.log
+      host_key_checking       = False
+      retry_files_enabled      = False
+      remote_tmp              = /tmp/${USER}/ansible
+      gathering               = smart
+      fact_caching            = redis
+      fact_caching_prefix      = ansible_facts_
+      fact_caching_timeout    = 60
+      fact_caching_connection = localhost:6379:0
+
+  - path: /etc/systemd/system/docker.service.d/override.conf
+    content: |
+      # Disable flags to dockerd, all settings are done in /etc/docker/daemon.json
+      [Service]
+      ExecStart=
+      ExecStart=/usr/bin/dockerd
+
+  - path: /etc/sysctl.d/enabled_ipv4_forwarding.conf
+    content: |
+      net.ipv4.conf.all.forwarding=1
+
+  - path: /etc/docker/daemon.json
+    content: |
+      {
+        "dns": [
+          "1.1.1.1",
+          "1.0.0.1"
+        ],
+        "hosts": ["tcp://0.0.0.0:2375", "unix:///var/run/docker.sock"]
+      }
+
+# TODO: QA
+ansible:
+  ansible_config: |
+    [defaults]
+    log_path                = /var/log/ansible.log
+    fact_caching            = jsonfile
+  install_method: distro
+  package_name: ansible.noarch
+  pull:
+    url: "https://github.com/pythoninthegrass/multipass_poc.git"
+    playbook_name: "tasks/pkg.yml"
+
+# bootcmd:
+#   - printf "[Resolve]\nDNS=1.1.1.1" > /etc/systemd/resolved.conf
+#   - printf "\nDNS=1.0.0.1" >> /etc/systemd/resolved.conf
+#   - systemctl restart systemd-resolved
+
+final_message: "The system is finally up, after $UPTIME seconds"
+
+# power_state:
+#   timeout: 300
+#   mode: reboot
