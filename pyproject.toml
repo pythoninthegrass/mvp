@@ -25,6 +25,9 @@ pytest-xdist = "^3.5.0"
 rich = "^13.7.1"
 ruff = "^0.4.1"
 
+[tool.uv.pip]
+index-url = "https://pypi.org/simple"
+
 [tool.ruff]
 # Fix without reporting on leftover violations
 fix-only = true
