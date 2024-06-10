@@ -25,6 +25,24 @@ pytest-xdist = "^3.6.1"
 rich = "^13.7.1"
 ruff = "^0.4.1"
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = [
+    ".cache",
+    ".eggs",
+    ".git",
+    ".github",
+    ".gitmodules",
+    ".pytest",
+    ".pytest_cache",
+    ".venv",
+    ".vscode",
+    "__pycache__",
+    "build",
+    "dist",
+    "node_modules"
+]
+
 [tool.uv.pip]
 index-url = "https://pypi.org/simple"
 
