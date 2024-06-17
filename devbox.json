@@ -1,6 +1,6 @@
 {
   "packages": [
-    "python@3.11.6",
+    "python@3.11.9",
     "python311Packages.pip@latest",
     "ansible-lint@latest",
     "ansible@latest",
@@ -10,10 +10,12 @@
     "git@latest",
     "gnumake@latest",
     "go-task@latest",
+    "kubectl@latest",
     "nodejs@21.4.0",
     "openssl@latest",
     "poetry@latest",
-    "tilt@latest"
+    "tilt@latest",
+    "uv@latest"
   ],
   "env": {
     "VENV_DIR": ".venv"
@@ -21,7 +23,7 @@
   "shell": {
     "init_hook": [
       ". $VENV_DIR/bin/activate",
-      "poetry install --no-root"
+      "uv pip install -r requirements.txt"
     ],
     "scripts": {
       "test":  "poetry run pytest"
