@@ -1,1 +1,19 @@
-
+argcomplete==3.4.0 ; python_version >= "3.11" and python_version < "3.13"
+asttokens==2.4.1 ; python_version >= "3.11" and python_version < "3.13"
+colorama==0.4.6 ; python_version >= "3.11" and python_version < "3.13" and sys_platform == "win32"
+decorator==5.1.1 ; python_version >= "3.11" and python_version < "3.13"
+executing==2.0.1 ; python_version >= "3.11" and python_version < "3.13"
+ipython==8.26.0 ; python_version >= "3.11" and python_version < "3.13"
+jedi==0.19.1 ; python_version >= "3.11" and python_version < "3.13"
+matplotlib-inline==0.1.7 ; python_version >= "3.11" and python_version < "3.13"
+parso==0.8.4 ; python_version >= "3.11" and python_version < "3.13"
+pexpect==4.9.0 ; python_version >= "3.11" and python_version < "3.13" and (sys_platform != "win32" and sys_platform != "emscripten")
+prompt-toolkit==3.0.47 ; python_version >= "3.11" and python_version < "3.13"
+ptyprocess==0.7.0 ; python_version >= "3.11" and python_version < "3.13" and (sys_platform != "win32" and sys_platform != "emscripten")
+pure-eval==0.2.2 ; python_version >= "3.11" and python_version < "3.13"
+pygments==2.18.0 ; python_version >= "3.11" and python_version < "3.13"
+six==1.16.0 ; python_version >= "3.11" and python_version < "3.13"
+stack-data==0.6.3 ; python_version >= "3.11" and python_version < "3.13"
+traitlets==5.14.3 ; python_version >= "3.11" and python_version < "3.13"
+typing-extensions==4.12.2 ; python_version >= "3.11" and python_version < "3.12"
+wcwidth==0.2.13 ; python_version >= "3.11" and python_version < "3.13"
