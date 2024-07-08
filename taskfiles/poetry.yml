@@ -93,6 +93,8 @@ tasks:
       - |
         poetry run poetry up 2>/dev/null
         poetry update --lock --no-ansi
+    env:
+      PIP_DEFAULT_TIMEOUT: "150"
 
   export-reqs:
     desc: "Export requirements.txt"

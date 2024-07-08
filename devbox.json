@@ -18,7 +18,8 @@
     "uv@latest"
   ],
   "env": {
-    "VENV_DIR": ".venv"
+    "VENV_DIR": ".venv",
+    "UV_HTTP_TIMEOUT": "150"
   },
   "shell": {
     "init_hook": [
