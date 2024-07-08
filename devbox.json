@@ -29,7 +29,7 @@
       "install": "uv pip install -r requirements.txt",
       "export-reqs": "uv pip freeze | uv pip compile - -o requirements.txt",
       "venv": "uv venv ${VENV_DIR} --allow-existing",
-      "test": "poetry run pytest"
+      "test": "pytest"
     }
   }
 }
