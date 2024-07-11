@@ -1,7 +1,7 @@
-# syntax=docker/dockerfile:1.6
+# syntax=docker/dockerfile:1.7
 
 # full semver just for python base image
-ARG PYTHON_VERSION=3.11.6
+ARG PYTHON_VERSION=3.11.9
 
 FROM python:${PYTHON_VERSION}-slim-bullseye AS builder
 
@@ -24,7 +24,7 @@ ENV PIP_DEFAULT_TIMEOUT=100
 
 # poetry env vars
 ENV POETRY_HOME="/opt/poetry"
-ENV POETRY_VERSION=1.7.1
+ENV POETRY_VERSION=1.8.3
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 ENV POETRY_NO_INTERACTION=1
 
