@@ -16,9 +16,8 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
     * [Minimum requirements](#minimum-requirements)
     * [Recommended requirements](#recommended-requirements)
   * [Development](#development)
-    * [Makefile](#makefile)
-    * [Taskfile](#taskfile)
     * [Devbox](#devbox)
+    * [Taskfile](#taskfile)
     * [Tilt](#tilt)
   * [TODO](#todo)
   * [Further Reading](#further-reading)
@@ -26,67 +25,22 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
 ## Setup
 ### Minimum requirements
 * [Python 3.11](https://www.python.org/downloads/)
-* Dev dependencies
-  * make
-    * [Linux](https://www.gnu.org/software/make/)
-    * [macOS](https://www.freecodecamp.org/news/install-xcode-command-line-tools/)
-  * [editorconfig](https://editorconfig.org/)
-  * [wsl](https://docs.microsoft.com/en-us/windows/wsl/setup/environment)
 
 ### Recommended requirements
 * [devbox](https://www.jetpack.io/devbox/docs/quickstart/)
 * [task](https://taskfile.dev/#/installation)
 
 ## Development
-### Makefile
-```bash
-# install all repo dependcies
-make install
-
-# install specific repo dependencies
-make <xcode|asdf|brew|devbox|pre-commit|task>
-```
-
-### Taskfile
-```bash
-λ task
-task: [default] task --list
-task: Available tasks for this project:
-* checkbash:            Check bash scripts
-* export-reqs:          Export requirements.txt
-* install:              Install project dependencies
-* pre-commit:           Run pre-commit hooks
-* run:                  Run the playbook
-* run-dev:              Run the playbook with tags and debug
-* update-deps:          Update dependencies
-* docker:build:         Build the docker image
-* docker:down:          Stop and remove containers, networks, and volumes with docker compose
-* docker:exec:          Shell into a running container               
-* docker:logs:          Follow the logs of a running container               
-* docker:net:           Create docker network 
-* docker:prune:         Prune docker          
-* docker:push:          Push the docker image to the registry                
-* docker:stop:          Stop the project with docker compose                  
-* docker:up:            Start the project with docker compose                  
-* docker:vol:           Create docker volume  
-```
-
 ### Devbox
-Devbox takes care of setting up a dev environment automatically. Under the hood it uses [Nix Package Manager](https://search.nixos.org/packages).
+Devbox takes care of setting up a dev environment automatically. 
 
-Currently, it supports the following:
-* [asdf](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)
-* [docker](https://docs.docker.com/compose/install/)
-* [gh](https://cli.github.com/manual/)
-* [minikube](https://minikube.sigs.k8s.io/docs/start/)
-* [nodejs (21.4)](https://nodejs.org/en/download/)
-* [poetry](https://python-poetry.org/docs/)
-* [python (3.11)](https://www.python.org/)
-* [task](https://taskfile.dev/#/installation)
-* [tilt](https://docs.tilt.dev/install.html)
+Under the hood it uses [Nix Package Manager](https://search.nixos.org/packages).
 
 ```bash
-# enter dev environment
+# install devbox
+./bootstrap
+
+# enter dev environment w/deps
 devbox shell
 
 # run repl
@@ -97,6 +51,40 @@ exit
 
 # run tests
 devbox run test
+```
+
+### Taskfile
+```bash
+λ task
+task: Available tasks for this project:
+* checkbash:                Check bash scripts
+* default:                  Default task
+* format:                   Run formatters
+* install:                  Install project dependencies
+* install-devbox:           Install devbox
+* lint:                     Run linters
+* pre-commit:               Run pre-commit hooks
+* pyclean:                  Remove .pyc and __pycache__
+* test:                     Run tests
+* docker:build:             Build the docker image                                                     (aliases: docker:build)
+* docker:down:              Stop and remove containers, networks, and volumes with docker compose      (aliases: docker:down)
+* docker:exec:              Shell into a running container                                             (aliases: docker:exec)
+* docker:login:             Login to the container registry                                            (aliases: docker:login)
+* docker:logs:              Follow the logs of a running container                                     (aliases: docker:logs)
+* docker:net:               Create docker network                                                      (aliases: docker:net)
+* docker:prune:             Prune docker                                                               (aliases: docker:prune)
+* docker:push:              Push the docker image to the registry                                      (aliases: docker:push)
+* docker:stop:              Stop the project with docker compose                                       (aliases: docker:stop)
+* docker:up:                Start the project with docker compose                                      (aliases: docker:up)
+* docker:vol:               Create docker volume                                                       (aliases: docker:vol)
+* poetry:add-pypi:          Add test-pypi repository                                                   (aliases: poetry:add-pypi)
+* poetry:build:             Build the poetry bin                                                       (aliases: poetry:build)
+* poetry:bump-semver:       Bump the project semantic version                                          (aliases: poetry:bump-semver)
+* poetry:default:           Default task                                                               (aliases: poetry:default, poetry, poetry)
+* poetry:export-reqs:       Export requirements.txt                                                    (aliases: poetry:export-reqs)
+* poetry:install:           Install project dependencies                                               (aliases: poetry:install)
+* poetry:publish:           Publish the poetry bin                                                     (aliases: poetry:publish)
+* poetry:update-deps:       Update dependencies                                                        (aliases: poetry:update-deps)
 ```
 
 ### Tilt
