@@ -7,7 +7,7 @@ env:
   BUILD: "{{.TLD}}/bin/build.sh"
   COMPOSE_FILE: "{{.TLD}}/docker-compose.yml"
   DOCKERFILE: "{{.TLD}}/Dockerfile"
-  PLATFORM: "linux/amd64"
+  PLATFORM: "linux/arm64/v8"
 
 tasks:
   net:
@@ -28,9 +28,28 @@ tasks:
 
   build:
     desc: "Build the docker image"
+    summary: |
+      Build the docker image with the specified dockerfile.
+
+      The default dockerfile is `Dockerfile`.
+
+      USAGE
+        task docker:build             # default image
+        task docker:build -- debian   # debian image
     cmds:
       - |
-        {{.BUILD}} build {{.DOCKERFILE}} {{.SERVICE}}
+        case {{.CLI_ARGS}} in
+          ubuntu|"")
+            {{.BUILD}} build {{.DOCKERFILE}} {{.SERVICE}}
+            ;;
+          debian)
+            {{.BUILD}} build {{.TLD}}/Dockerfile.debian {{.SERVICE}}
+            ;;
+          *)
+            echo "Invalid dockerfile"
+            ;;
+        esac
+    dir: "{{.TLD}}"
 
   login:
     desc: "Login to the container registry"

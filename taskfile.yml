@@ -14,6 +14,7 @@ env:
     sh: "echo ${POETRY:-1.8.3}"
   PY_VER:
     sh: "echo ${PY_VER:-3.11.9}"
+  SERVICE: "mvp"
   SCRIPT:
   UNAME:
     sh: "uname -s"

@@ -7,9 +7,9 @@
 TLD="$(git rev-parse --show-toplevel)"
 ENV_FILE="${TLD}/app/.env"
 [[ -f "${ENV_FILE}" ]] && export $(grep -v '^#' ${ENV_FILE} | xargs)
-PLATFORM="linux/amd64"
-REGISTRY=${REGISTRY:-docker.io}
-USER_NAME=${USER_NAME:-pythoninthegrass}
+PLATFORM="${PLATFORM:-linux/arm64/v8}"
+REGISTRY=${REGISTRY:-}
+USER_NAME=${USER_NAME:-}
 SERVICE=${SERVICE:-mvp}
 
 # check that buildx is installed
@@ -23,11 +23,19 @@ fi
 build() {
 	FILENAME=$1
 	SERVICE=$2
-	docker buildx build \
-		--platform="${PLATFORM}" \
-		-f "${FILENAME}" \
-		-t "${REGISTRY}/${USER_NAME}/${SERVICE}" \
-		--load .
+	if [[ -z "${REGISTRY}" ]] || [[ -z "${USER_NAME}" ]]; then
+		docker buildx build \
+			--platform="${PLATFORM}" \
+			-f "${FILENAME}" \
+			-t "${SERVICE}" \
+			--load .
+	else
+		docker buildx build \
+			--platform="${PLATFORM}" \
+			-f "${FILENAME}" \
+			-t "${REGISTRY}/${USER_NAME}/${SERVICE}" \
+			--load .
+	fi
 }
 
 main() {
