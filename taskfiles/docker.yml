@@ -38,8 +38,12 @@ tasks:
         task docker:build -- debian   # debian image
     cmds:
       - |
-        case {{.CLI_ARGS}} in
-          ubuntu|"")
+        args={{.CLI_ARGS}}
+        if [[ -z "$args" ]]; then
+          args="ubuntu"
+        fi
+        case "$args" in
+          ubuntu)
             {{.BUILD}} build {{.DOCKERFILE}} {{.SERVICE}}
             ;;
           debian)
