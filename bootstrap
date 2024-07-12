@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+# $USER
+[[ -n $(logname >/dev/null 2>&1) ]] && logged_in_user=$(logname) || logged_in_user=$(whoami)
+
+# $HOME
+logged_in_home=$(eval echo "~${logged_in_user}")
+
+# top-level directory
+tld=$(git rev-parse --show-toplevel)
+
+# devbox files/directories
+declare -a files=(
+    "/usr/local/bin/devbox"
+    "${logged_in_home}/.cache/devbox"
+    "${logged_in_home}/.local/share/devbox"
+    "/nix"
+    "/etc/nix"
+    "/var/root/.nix-profile"
+    "/var/root/.nix-defexpr"
+    "/var/root/.nix-channels"
+    "${logged_in_home}/.nix-profile"
+    "${logged_in_home}/.nix-defexpr"
+    "${logged_in_home}/.nix-channels"
+)
+
+# uninstall devbox
+if [[ $# -eq 1 && $1 == "--uninstall" || $1 == "-u" ]]; then
+    if [[ $(command -v devbox 2>/dev/null) ]]; then
+        echo "Uninstalling devbox..."
+        for file in "${files[@]}"; do
+            [[ -e "$file" ]] && sudo rm -rf "$file"
+        done
+        echo "devbox uninstalled"
+    else
+        echo "devbox not installed"
+    fi
+    exit 0
+fi
+
+# install devbox
+if ! [[ $(command -v devbox 2>/dev/null) ]]; then
+	curl -fsSL https://get.jetify.com/devbox | bash
+else
+    echo "devbox already installed"
+    exit 0
+fi
+
+# setup devbox
+(cd $tld && devbox install)
+ret_code=$?
+
+if [[ $ret_code -eq 0 ]]; then
+	echo "devbox install succeeded"
+	echo "Run 'devbox shell' to get started!"
+	exit 0
+else
+	echo "devbox install failed with code $ret_code"
+	exit $ret_code
+fi

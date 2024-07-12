@@ -11,9 +11,9 @@ env:
   APP:
     sh: echo "${APP_NAME:-mvp}"
   POETRY:
-    sh: "echo ${POETRY:-1.7.1}"
+    sh: "echo ${POETRY:-1.8.3}"
   PY_VER:
-    sh: "echo ${PY_VER:-3.11.6}"
+    sh: "echo ${PY_VER:-3.11.9}"
   SCRIPT:
   UNAME:
     sh: "uname -s"
@@ -51,11 +51,21 @@ tasks:
     cmds:
       - task --list
 
-  install:
-    desc: "Install project dependencies"
+  install-devbox:
+    desc: "Install devbox"
     cmds:
       - |
-        make install
+        if ! [[ $(command -v devbox 2>/dev/null) ]]; then
+          curl -fsSL https://get.jetify.com/devbox | bash
+        fi
+    run: once
+    silent: true
+
+  install:
+    desc: "Install project dependencies"
+    deps: ["install-devbox"]
+    cmds:
+      - devbox install
 
   pre-commit:
     desc: "Run pre-commit hooks"
@@ -65,17 +75,17 @@ tasks:
   lint:
     desc: "Run linters"
     cmds:
-      - poetry run ruff check --fix --respect-gitignore
+      - ruff check --fix --respect-gitignore
 
   format:
     desc: "Run formatters"
     cmds:
-      - poetry run ruff format --respect-gitignore
+      - ruff format --respect-gitignore
 
   test:
     desc: "Run tests"
     cmds:
-      - poetry run pytest
+      - pytest
 
   pyclean:
     desc: "Remove .pyc and __pycache__"
