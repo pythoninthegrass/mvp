@@ -1,0 +1,73 @@
+# syntax=docker/dockerfile:1.7
+
+ARG PYTHON_VERSION=3.11.9
+
+FROM python:${PYTHON_VERSION}-slim-bookworm as builder
+
+ARG ANSIBLE_VERSION="6.7.0"
+ARG ANSIBLE_LINT_VERSION="6.13.1"
+
+ENV VENV_PATH=/opt/venv
+ENV PATH="$VENV_PATH/bin:$PATH"
+
+RUN python3 -m venv $VENV_PATH
+
+ENV PIP_CACHE_DIR=/root/.cache/pip
+ENV PIP_DISABLE_PIP_VERSION_CHECK=on
+ENV PIP_DEFAULT_TIMEOUT=100
+
+RUN mkdir -p $PIP_CACHE_DIR
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    python3 -m pip install --upgrade pip setuptools \
+    && python3 -m pip install \
+        ansible==$ANSIBLE_VERSION \
+        ansible-lint==$ANSIBLE_LINT_VERSION
+
+WORKDIR /ansible-role-asdf
+
+COPY . .
+
+FROM python:${PYTHON_VERSION}-slim-bookworm as runner
+
+ARG PLAYBOOK_FILE="golang.yml"
+ARG PLUGIN_EXEC="go version"
+
+ARG USER_NAME=deploy
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -qq \
+    && apt-get install -qq --no-install-recommends -y \
+        apt-utils \
+        ca-certificates \
+        git \
+        sudo \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+WORKDIR /ansible-role-asdf
+
+ENV VENV_PATH=/opt/venv
+ENV PATH="$VENV_PATH/bin:$PATH"
+
+COPY --from=builder $VENV_PATH $VENV_PATH
+COPY . .
+
+RUN groupadd --gid $USER_GID $USER_NAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USER_NAME \
+    && mkdir -p /etc/sudoers.d \
+    && echo "$USER_NAME ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/$USER_NAME \
+    && chmod 0440 /etc/sudoers.d/$USER_NAME
+
+# Standardise on locale, don't generate .pyc, enable tracebacks on seg faults
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONFAULTHANDLER 1
+
+USER ${USER_NAME}
+
+CMD [ "./tests/entrypoint.sh" ]
