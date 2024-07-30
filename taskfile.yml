@@ -18,6 +18,7 @@ env:
   SCRIPT:
   UNAME:
     sh: "uname -s"
+  VENV_DIR: ".venv"
 
 vars:
 
