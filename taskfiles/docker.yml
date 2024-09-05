@@ -35,25 +35,13 @@ tasks:
 
       USAGE
         task docker:build             # default image
-        task docker:build -- debian   # debian image
     cmds:
       - |
-        args={{.CLI_ARGS}}
-        if [[ -z "$args" ]]; then
-          args="ubuntu"
+        if [[ -z "{{.CLI_ARGS}}" ]]; then
+          {{.BUILD}} {{.DOCKERFILE}} {{.SERVICE}}
+        else
+          {{.BUILD}} {{.CLI_ARGS}} {{.SERVICE}}
         fi
-        case "$args" in
-          ubuntu)
-            {{.BUILD}} build {{.DOCKERFILE}} {{.SERVICE}}
-            ;;
-          debian)
-            {{.BUILD}} build {{.TLD}}/Dockerfile.debian {{.SERVICE}}
-            ;;
-          *)
-            echo "Invalid dockerfile"
-            ;;
-        esac
-    dir: "{{.TLD}}"
 
   login:
     desc: "Login to the container registry"
