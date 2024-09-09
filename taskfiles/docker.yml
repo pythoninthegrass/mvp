@@ -7,7 +7,15 @@ env:
   BUILD: "{{.TLD}}/bin/build.sh"
   COMPOSE_FILE: "{{.TLD}}/docker-compose.yml"
   DOCKERFILE: "{{.TLD}}/Dockerfile"
-  PLATFORM: "linux/arm64/v8"
+  PLATFORM:
+    sh: "echo ${PLATFORM:-linux/arm64/v8}"
+  REGISTRY:
+    sh: "echo ${REGISTRY:-ghcr.io}"
+  USER_NAME:
+    sh: "echo ${USER_NAME:-pythoninthegrass}"
+  SERVICE: "mvp"
+  VERSION:
+    sh: "echo ${VERSION:-latest}"
 
 tasks:
   net:
@@ -24,7 +32,7 @@ tasks:
       - |
         docker volume create \
         --driver local \
-        mvp-vol
+        {{.SERVICE}}-vol
 
   build:
     desc: "Build the docker image"
@@ -34,13 +42,13 @@ tasks:
       The default dockerfile is `Dockerfile`.
 
       USAGE
-        task docker:build             # default image
+        task docker:build
     cmds:
       - |
         if [[ -z "{{.CLI_ARGS}}" ]]; then
           {{.BUILD}} {{.DOCKERFILE}} {{.SERVICE}}
         else
-          {{.BUILD}} {{.CLI_ARGS}} {{.SERVICE}}
+          {{.BUILD}} {{.CLI_ARGS}} {{.DOCKERFILE}} {{.SERVICE}}
         fi
 
   login:

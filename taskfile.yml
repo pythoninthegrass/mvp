@@ -8,16 +8,6 @@ dotenv: ['.env']
 env:
   TLD:
     sh: git rev-parse --show-toplevel
-  APP:
-    sh: echo "${APP_NAME:-mvp}"
-  POETRY:
-    sh: "echo ${POETRY:-1.8.3}"
-  PY_VER:
-    sh: "echo ${PY_VER:-3.11.9}"
-  SERVICE: "mvp"
-  SCRIPT:
-  UNAME:
-    sh: "uname -s"
   VENV_DIR: ".venv"
 
 vars:
@@ -31,23 +21,6 @@ includes:
     aliases: ["poetry"]
 
 tasks:
-  print:
-    - |
-      echo -e "TLD:\t\t$TLD"
-      echo -e "APP:\t\t{{.APP}}"
-      echo -e "BUILD:\t\t{{.BUILD}}"
-      echo -e "COMPOSE_FILE:\t{{.COMPOSE_FILE}}"
-      echo -e "DOCKERFILE:\t{{.DOCKERFILE}}"
-      echo -e "PLATFORM:\t{{.PLATFORM}}"
-      echo -e "POETRY:\t\t{{.POETRY}}"
-      echo -e "PY_VER:\t\t{{.PY_VER}}"
-      echo -e "SCRIPT:\t\t{{.SCRIPT}}"
-      echo -e "REGISTRY:\t$REGISTRY"
-      echo -e "SERVICE:\t{{.SERVICE}}"
-      echo -e "TAG:\t\t${TAG}"
-      echo -e "USER_NAME:\t$USER_NAME"
-      echo -e "UNAME:\t\t$UNAME"
-
   default:
     desc: "Default task"
     cmds:
@@ -101,14 +74,9 @@ tasks:
         )
         case "{{.CLI_ARGS}}" in
           dry-run)
-            poetry run pyclean "${args[@]}" --dry-run
+            pyclean "${args[@]}" --dry-run
             ;;
           *)
-            poetry run pyclean "${args[@]}"
+            pyclean "${args[@]}"
             ;;
         esac
-
-  checkbash:
-    desc: "Check bash scripts"
-    cmds:
-      - checkbashism -x {{.TLD}}/app/*.sh

@@ -47,7 +47,7 @@ else
 fi
 
 # setup devbox
-(cd $tld && devbox install)
+(cd "$tld" && devbox install)
 ret_code=$?
 
 if [[ $ret_code -eq 0 ]]; then
