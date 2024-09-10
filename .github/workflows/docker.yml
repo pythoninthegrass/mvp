@@ -9,7 +9,6 @@ on:
       - '*.*.*'
     paths:
       - 'Dockerfile'
-      - 'docker-compose.yml'
       - 'pyproject.toml'
       - 'poetry.lock'
       - 'requirements.txt'
@@ -19,7 +18,12 @@ on:
       - '**.css'
       - '.dockerignore'
       - '.env.example'
+      - '.github/workflows/**'
       - 'static/**'
+  workflow_run:
+    workflows: ["Run pytest"]
+    types:
+      - completed
 
 env:
   REGISTRY_URL: ${{ vars.REGISTRY_URL }}
@@ -29,15 +33,19 @@ env:
 jobs:
   push_to_registry:
     name: Push Docker image to container registry
-    strategy:
-      fail-fast: true
+    if: |
+      (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/'))) ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch || github.ref }}
+      cancel-in-progress: true
     permissions:
       packages: write
       contents: read
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # - name: Log into Docker Hub
       #   if: ${{ github.event_name != 'pull_request' }}
@@ -47,8 +55,7 @@ jobs:
       #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Login to GitHub Container Registry
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -56,7 +63,7 @@ jobs:
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: |
             name=${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USER }}/${{ env.IMAGE }}
@@ -68,17 +75,17 @@ jobs:
             latest=false
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64/v8
