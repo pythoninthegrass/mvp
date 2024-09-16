@@ -8,10 +8,9 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
-argcomplete = "^3.4.0"
-ipython = "^8.26.0"
 
 [tool.poetry.group.dev.dependencies]
+argcomplete = "^3.4.0"
 coverage = "^7.5.4"
 hypothesis = {extras = ["cli"], version = "^6.105.1"}
 icecream = "^2.1.3"
