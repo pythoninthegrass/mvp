@@ -1,5 +1,8 @@
 {
-  "devbox.autoShellOnTerminal": true,
+  "github.copilot.chat.experimental.codeGeneration.instructions": [
+    {"file": "CODE_STYLE.md"}
+  ],
+  "devbox.autoShellOnTerminal": false,
   "[python]": {
     "editor.insertSpaces": true,
     "editor.tabSize": 4,
