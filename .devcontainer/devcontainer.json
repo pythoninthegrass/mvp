@@ -10,10 +10,14 @@
   "dockerComposeFile": "../docker-compose.yml",
   "overrideCommand": true,
   "shutdownAction": "stopCompose",
+  "containerEnv": {
+    "SHELL": "/bin/bash"
+  },
   "customizations": {
     "vscode": {
       "extensions": [
         "aaron-bond.better-comments",
+        "charliermarsh.ruff",
         "codezombiech.gitignore",
         "eamodio.gitlens",
         "EditorConfig.EditorConfig",
@@ -24,10 +28,8 @@
         "mads-hartmann.bash-ide-vscode",
         "mechatroner.rainbow-csv",
         "ms-azuretools.vscode-docker",
-        "ms-kubernetes-tools.vscode-kubernetes-tools",
         "ms-python.python",
         "ms-vscode.atom-keybindings",
-        "ms-vsliveshare.vsliveshare",
         "redhat.ansible",
         "redhat.vscode-yaml",
         "ryu1kn.partial-diff",
@@ -35,9 +37,9 @@
         "yzhang.markdown-all-in-one"
       ]
     }
-  },
-  "forwardPorts": [
-    8000,
-    8080
-  ]
+  }
+  // "forwardPorts": [
+  //   8000,
+  //   8080
+  // ]
 }

@@ -1,6 +1,7 @@
 {
   "recommendations": [
     "aaron-bond.better-comments",
+    "charliermarsh.ruff",
     "codezombiech.gitignore",
     "eamodio.gitlens",
     "EditorConfig.EditorConfig",
