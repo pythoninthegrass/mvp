@@ -6,13 +6,19 @@
   //   "dockerfile": "../Dockerfile"
   // }
   "service": "app",
-  "workspaceFolder": "/app",
-  "dockerComposeFile": "../docker-compose.yml",
+  "workspaceFolder": "/workspace",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "docker-compose.extend.yml"
+  ],
   "overrideCommand": true,
   "shutdownAction": "stopCompose",
   "containerEnv": {
-    "SHELL": "/bin/bash"
+    "SHELL": "/bin/bash",
+    "DEBIAN_FRONTEND": "noninteractive"
   },
+  "remoteUser": "appuser",
+  // "postCreateCommand": "apt-get update && apt-get install -y git",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -37,9 +43,17 @@
         "yzhang.markdown-all-in-one"
       ]
     }
-  }
-  // "forwardPorts": [
-  //   8000,
-  //   8080
-  // ]
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/sshd:1": {},
+    "ghcr.io/joshuanianji/devcontainer-features/github-cli-persistence:1": {},
+    "ghcr.io/audacioustux/devcontainers/taskfile:1": {},
+    "ghcr.io/nikobockerman/devcontainer-features/poetry-persistent-cache:1": {},
+    "ghcr.io/va-h/devcontainers-features/uv:1": {}
+  },
+  "forwardPorts": [
+    2222
+  ]
 }
