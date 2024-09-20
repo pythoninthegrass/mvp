@@ -133,3 +133,5 @@ ENV PATH=$VENV_PATH/bin:$HOME/.local/bin:$PATH
 EXPOSE 8000
 
 CMD ["sleep", "infinity"]
+
+LABEL org.opencontainers.image.title="mvp"

@@ -71,3 +71,5 @@ ENV PYTHONFAULTHANDLER 1
 USER ${USER_NAME}
 
 CMD [ "./tests/entrypoint.sh" ]
+
+LABEL org.opencontainers.image.title="mvp-debian"

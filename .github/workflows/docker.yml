@@ -1,4 +1,4 @@
-name: Publish Docker image
+name: Publish Docker images
 
 on:
   push:
@@ -8,18 +8,16 @@ on:
     tags:
       - '*.*.*'
     paths:
-      - 'Dockerfile'
+      - 'Dockerfile*'
       - 'pyproject.toml'
       - 'poetry.lock'
       - 'requirements.txt'
       - '**.py'
       - '**.sh'
-      - '**.js'
-      - '**.css'
       - '.dockerignore'
       - '.env.example'
       - '.github/workflows/**'
-      - 'static/**'
+  workflow_dispatch:
   workflow_run:
     workflows: ["Run pytest"]
     types:
@@ -28,7 +26,6 @@ on:
 env:
   REGISTRY_URL: ${{ vars.REGISTRY_URL }}
   REGISTRY_USER: ${{ vars.REGISTRY_USER }}
-  IMAGE: ${{ vars.IMAGE }}
 
 jobs:
   push_to_registry:
@@ -37,8 +34,11 @@ jobs:
       (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/'))) ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dockerfile: [Dockerfile, Dockerfile.debian]
     concurrency:
-      group: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch || github.ref }}
+      group: ${{ github.workflow }}-${{ matrix.dockerfile }}-${{ github.event.workflow_run.head_branch || github.ref }}
       cancel-in-progress: true
     permissions:
       packages: write
@@ -47,26 +47,25 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      # - name: Log into Docker Hub
-      #   if: ${{ github.event_name != 'pull_request' }}
-      #   uses: docker/login-action@v3
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Login to GitHub Container Registry
+      - name: Log into container registry
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY_URL }}
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract image name from Dockerfile
+        id: image_name
+        run: |
+          IMAGE=$(grep "LABEL org.opencontainers.image.title" ${{ matrix.dockerfile }} | cut -d'"' -f2)
+          echo "IMAGE=$IMAGE" >> $GITHUB_OUTPUT
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: |
-            name=${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USER }}/${{ env.IMAGE }}
+            name=${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USER }}/${{ steps.image_name.outputs.IMAGE }}
           tags: |
             type=raw,value=latest,enable=${{ endsWith(github.ref, 'main') }}
             type=ref,event=branch,enable=${{ !endsWith(github.ref, 'main') }}
@@ -84,7 +83,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
+          file: ./${{ matrix.dockerfile }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
