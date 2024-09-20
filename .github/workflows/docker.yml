@@ -43,6 +43,7 @@ jobs:
     permissions:
       packages: write
       contents: read
+      actions: read
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -88,5 +89,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64/v8
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: |
+            type=registry,ref=ghcr.io/${{ github.repository_owner }}/build-cache:${{ steps.image_name.outputs.IMAGE }}-buildcache
+          cache-to: |
+            type=registry,ref=ghcr.io/${{ github.repository_owner }}/build-cache:${{ steps.image_name.outputs.IMAGE }}-buildcache,mode=max
