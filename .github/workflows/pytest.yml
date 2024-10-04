@@ -6,11 +6,14 @@ on:
       - main
       - master
     paths:
-      - '**.py'
+      - '**/*.py'
   pull_request:
     branches:
       - main
       - master
+    paths:
+      - '**/*.py'
+  workflow_dispatch:
 
 jobs:
   test:
