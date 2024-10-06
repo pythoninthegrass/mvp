@@ -128,7 +128,7 @@ fixable = ["A", "B", "C", "D", "E", "F", "G", "I", "N", "Q", "S", "T", "W", "ANN
 
 [tool.ruff.lint.isort]
 from-first = false
-lines-after-imports = 1
+lines-after-imports = 2
 lines-between-types = 0
 no-sections = true
 
