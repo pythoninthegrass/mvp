@@ -1,15 +1,12 @@
 {
-  "github.copilot.chat.experimental.codeGeneration.instructions": [
-    {"file": "CODE_STYLE.md"}
-  ],
-  "devbox.autoShellOnTerminal": false,
   "[python]": {
     "editor.insertSpaces": true,
     "editor.tabSize": 4,
-    "editor.defaultFormatter": "charliermarsh.ruff"
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "source.fixAll": "explicit"
+    }
   },
-  "python.defaultInterpreterPath": "${workspaceFolder}/app/.venv/bin/python",
-  "python.terminal.activateEnvInCurrentTerminal": true,
   "python.testing.pytestArgs": [
     "tests"
   ],
@@ -18,9 +15,5 @@
   // https://github.com/astral-sh/ruff-vscode
   "python.analysis.ignore": [
     "*"
-  ],
-  "debug.inlineValues": "off",
-  "ruff.lint.run": "onType",
-  "ruff.organizeImports": true,
-  "ruff.showNotifications": "onError"
+  ]
 }
