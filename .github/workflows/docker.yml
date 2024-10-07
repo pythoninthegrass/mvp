@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dockerfile: [Dockerfile, Dockerfile.debian]
+        dockerfile: [Dockerfile]
     concurrency:
       group: ${{ github.workflow }}-${{ matrix.dockerfile }}-${{ github.event.workflow_run.head_branch || github.ref }}
       cancel-in-progress: true
