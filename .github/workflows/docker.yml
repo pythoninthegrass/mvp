@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dockerfile: [Dockerfile, Dockerfile.debian]
+        dockerfile: [Dockerfile]
     concurrency:
       group: ${{ github.workflow }}-${{ matrix.dockerfile }}-${{ github.event.workflow_run.head_branch || github.ref }}
       cancel-in-progress: true
@@ -66,10 +66,10 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            name=${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USER }}/${{ steps.image_name.outputs.IMAGE }}
+            ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USER }}/${{ steps.image_name.outputs.IMAGE }}
           tags: |
-            type=raw,value=latest,enable=${{ endsWith(github.ref, 'main') }}
-            type=ref,event=branch,enable=${{ !endsWith(github.ref, 'main') }}
+            type=raw,value=latest,enable=${{ endsWith(github.ref, 'main') || endsWith(github.ref, 'master') }}
+            type=ref,event=branch,enable=${{ !endsWith(github.ref, 'main') && !endsWith(github.ref, 'master') }}
             type=semver,pattern={{version}}
           flavor: |
             latest=false
@@ -89,7 +89,5 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64/v8
-          cache-from: |
-            type=registry,ref=ghcr.io/${{ github.repository_owner }}/build-cache:${{ steps.image_name.outputs.IMAGE }}-buildcache
-          cache-to: |
-            type=registry,ref=ghcr.io/${{ github.repository_owner }}/build-cache:${{ steps.image_name.outputs.IMAGE }}-buildcache,mode=max
+          cache-from: type=registry,ref=${{ steps.meta.outputs.tags }}
+          cache-to: type=registry,ref=${{ steps.meta.outputs.tags }},mode=max

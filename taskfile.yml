@@ -6,8 +6,7 @@ shopt: ['globstar']
 dotenv: ['.env']
 
 env:
-  TLD:
-    sh: git rev-parse --show-toplevel
+  TLD: "{{.ROOT_DIR}}"
   VENV_DIR: ".venv"
 
 vars:
@@ -15,10 +14,8 @@ vars:
 includes:
   docker:
     taskfile: ./taskfiles/docker.yml
-    aliases: ["docker"]
   poetry:
     taskfile: ./taskfiles/poetry.yml
-    aliases: ["poetry"]
 
 tasks:
   default:
