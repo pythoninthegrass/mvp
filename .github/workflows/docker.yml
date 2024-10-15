@@ -18,10 +18,10 @@ on:
       - '.env.example'
       - '.github/workflows/**'
   workflow_dispatch:
-  workflow_run:
-    workflows: ["Run pytest"]
-    types:
-      - completed
+  # workflow_run:
+  #   workflows: ["Run pytest"]
+  #   types:
+  #     - completed
 
 env:
   REGISTRY_URL: ${{ vars.REGISTRY_URL }}
@@ -30,30 +30,72 @@ env:
 jobs:
   push_to_registry:
     name: Push Docker image to container registry
-    if: |
-      (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/'))) ||
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
     strategy:
       matrix:
         dockerfile: [Dockerfile]
     concurrency:
-      group: ${{ github.workflow }}-${{ matrix.dockerfile }}-${{ github.event.workflow_run.head_branch || github.ref }}
+      # group: ${{ github.workflow }}-${{ matrix.dockerfile }}-${{ github.event.workflow_run.head_branch || github.ref }}
+      group: ${{ github.workflow }}-${{ matrix.dockerfile }}-${{ github.head_ref || github.ref }}
       cancel-in-progress: true
     permissions:
       packages: write
       contents: read
       actions: read
+      id-token: write
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
 
+      - name: Set password by container registry
+        run: |
+          case "${{ env.REGISTRY_URL }}" in
+            "ghcr.io")
+              echo "REGISTRY_PASS=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+              ;;
+            "*.dkr.ecr.*.amazonaws.com")
+              echo "Using AWS ECR - will authenticate in a separate step" >> $GITHUB_STEP_SUMMARY
+              ;;
+            "gcr.io")
+              echo "Using GCR - will authenticate in a separate step" >> $GITHUB_STEP_SUMMARY
+              ;;
+            *)
+              if [ -n "${{ secrets.REGISTRY_PASS }}" ]; then
+                echo "REGISTRY_PASS=${{ secrets.REGISTRY_PASS }}" >> $GITHUB_ENV
+              else
+                echo "REGISTRY_PASS secret is not set and registry is not recognized. Exiting..."
+                exit 1
+              fi
+              ;;
+          esac
+
+      - name: Configure AWS Credentials
+        if: contains(env.REGISTRY_URL, '.dkr.ecr.')
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        if: contains(env.REGISTRY_URL, '.dkr.ecr.')
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Authenticate to Google Cloud
+        if: env.REGISTRY_URL == 'gcr.io'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
       - name: Log into container registry
+        if: >
+          env.REGISTRY_URL != '*.dkr.ecr.*.amazonaws.com'
+          && env.REGISTRY_URL != 'gcr.io'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY_URL }}
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ env.REGISTRY_USER }}
+          password: ${{ env.REGISTRY_PASS }}
 
       - name: Extract image name from Dockerfile
         id: image_name
