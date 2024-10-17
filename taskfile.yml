@@ -16,6 +16,8 @@ includes:
     taskfile: ./taskfiles/docker.yml
   poetry:
     taskfile: ./taskfiles/poetry.yml
+  redis:
+    taskfile: ./taskfiles/redis.yml
 
 tasks:
   default:

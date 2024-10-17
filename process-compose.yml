@@ -1,0 +1,39 @@
+version: "0.5"
+
+log_location: /tmp/process-compose.log
+log_level: info     # trace / debug / info / warn / error / fatal / panic
+log_configuration:
+  rotation:
+    max_size_mb: 1  # size in MB of the logfile before it's rolled
+    max_age_days: 5 # age in days to keep a logfile
+    max_backups: 3  # number of rolled files to keep
+    compress: true
+
+is_strict: true
+
+disable_env_expansion: true
+
+processes:
+  redis:
+    command: >
+      docker run --rm -d \
+        --name "${NAME:-devbox-redis}" \
+        -p "${PORT:-6379}:6379" \
+        "redis:${VERSION:-6.2}-alpine"
+    is_daemon: true
+    environment: null
+    readiness_probe:
+      exec:
+        command: >
+          timeout 12s bash -c \
+          "until echo PING \
+          | nc -z localhost ${PORT:-6379} \
+          ; do sleep 1 \
+          ; done"
+    availability:
+      exit_on_end: true
+    is_tty: false
+    shutdown:
+      command: "docker stop ${NAME:-devbox-redis}"
+      timeout_seconds: 10           # default: 10
+      signal: 15                    # default: 15

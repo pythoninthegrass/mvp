@@ -1,0 +1,22 @@
+version: "3.0"
+
+set: ['e', 'u', 'pipefail']
+shopt: ['globstar']
+
+env:
+  NAME: dev-redis
+  PORT: 6379
+  VERSION: 6.2
+
+tasks:
+  start:
+    desc: "Start Redis server"
+    cmds:
+      - process-compose up -D redis 2>&1 > /dev/null
+    silent: true
+
+  stop:
+    desc: "Stop Redis server"
+    cmds:
+      - process-compose down
+    silent: true
