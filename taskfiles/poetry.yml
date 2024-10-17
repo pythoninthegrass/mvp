@@ -10,7 +10,7 @@ tasks:
       - task --list
 
   add-pypi:
-    desc: "Add test-pypi repository"
+    desc: "Add pypi or test-pypi repository"
     cmds:
       - |
         case {{.CLI_ARGS}} in
@@ -47,7 +47,12 @@ tasks:
     desc: "Bump the project semantic version"
     cmds:
       - |
-        case {{.CLI_ARGS}} in
+        if [[ -n "{{.CLI_ARGS}}" ]]; then
+          args="{{.CLI_ARGS}}"
+        else
+          args="prerelease"
+        fi
+        case $args in
           "major")
             poetry version major --no-ansi
             ;;
@@ -60,10 +65,36 @@ tasks:
           "prerelease")
             poetry version prerelease --no-ansi
             ;;
-          *|"")
+          *)
             echo "Invalid version"
             ;;
         esac
+
+  release:
+    desc: "Set the release version manually"
+    summary: |
+      Set the release version manually in git.
+
+      USAGE
+        task poetry:release             # Bump the version to prerelease
+        task poetry:release -- major    # Bump the version to major
+    aliases: ["release-please", "really", "plz"]
+    cmds:
+      - task: bump-semver
+      - |
+        VERSION=$(poetry version -s)
+
+        sed -i -e 's#__version__ = .*#__version__ = '"$(cat <<EOF
+        '${VERSION}'
+        EOF
+        )"'#' src/*/__init__.py
+
+        git add pyproject.toml src/*/__init__.py
+        git commit \
+          --allow-empty \
+          -m "chore: release ${VERSION}" \
+          -m "Release-As: ${VERSION}" \
+          --no-verify
 
   publish:
     desc: "Publish the poetry bin"
@@ -91,10 +122,9 @@ tasks:
     desc: "Update dependencies"
     cmds:
       - |
-        poetry run poetry up 2>/dev/null
+        poetry cache clear --all pypi --no-ansi
+        poetry up 2>/dev/null
         poetry update --lock --no-ansi
-    env:
-      PIP_DEFAULT_TIMEOUT: "150"
 
   export-reqs:
     desc: "Export requirements.txt"
@@ -103,7 +133,7 @@ tasks:
     cmds:
       - |
         poetry export -f requirements.txt \
-          --output {{.TLD}}/requirements.txt \
+          --output {{.ROOT_DIR}}/requirements.txt \
           --without-hashes \
           --no-ansi
     ignore_error: true
