@@ -26,13 +26,7 @@ RESET := $(shell tput -Txterm sgr0)
 
 # Usage: $(call check_bin,command_name)
 define check_bin
-	$(shell \
-		if command -v $(1) >/dev/null 2>&1; then \
-			echo "false"; \
-		else \
-			echo "true"; \
-		fi \
-	)
+	$(shell command -v $(1) 2>/dev/null)
 endef
 
 # Usage: $(call brew_install,package_name)
@@ -44,7 +38,7 @@ define brew_install
 			"go-task") binary_name="task" ;; \
 			*) binary_name="$(1)" ;; \
 		esac; \
-		if $(call check_bin,$$binary_name); then \
+		if [ -z "$(call check_bin,$$binary_name)" ]; then \
 			echo "Installing $(1)..."; \
 			brew install $(1); \
 		else \
@@ -57,7 +51,9 @@ endef
 
 # targets
 .PHONY: all
-all: help asdf xcode brew jq pre-commit sccache task ## run all targets
+all: help install ## run all targets
+
+install: xcode asdf brew devbox jq pre-commit sccache task ## install dependencies
 
 xcode: ## install xcode command line tools
 ifeq ($(UNAME), Darwin)
@@ -73,14 +69,14 @@ endif
 
 brew: xcode ## install homebrew
 ifeq ($(UNAME), Darwin)
-	@if $(call check_bin,brew); then \
+	@if [ -z "$(call check_bin,brew)" ]; then \
 		echo "Installing Homebrew..."; \
 		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
 	else \
 		echo "brew already installed."; \
 	fi
 else ifeq ($(UNAME), Linux)
-	@if $(call check_bin,brew) && [ "${ID_LIKE}" = "debian" ]; then \
+	@if [ -z "$(call check_bin,brew)" ] && [ "${ID_LIKE}" = "debian" ]; then \
 		echo "Installing Homebrew..."; \
 		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
 	else \
@@ -91,7 +87,7 @@ else
 endif
 
 asdf: xcode ## install asdf
-	@if $(call check_bin,asdf); then \
+	@if [ -z "$(call check_bin,asdf)" ]; then \
 		echo "Installing asdf..."; \
 		git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch ${ASDF_VERSION}; \
 		echo "To use asdf, add the following to your shell rc (.bashrc/.zshrc):"; \
@@ -100,6 +96,14 @@ asdf: xcode ## install asdf
 		echo ". $$HOME/.asdf/completions/asdf.bash"; \
 	else \
 		echo "asdf already installed."; \
+	fi
+
+devbox: ## install devbox
+	@if [ -z "$(call check_bin,devbox)" ]; then \
+		echo "Installing devbox..."; \
+		curl -fsSL https://get.jetpack.io/devbox | bash; \
+	else \
+		echo "devbox already installed."; \
 	fi
 
 jq: brew ## install jq
@@ -113,8 +117,6 @@ sccache: brew ## install sccache
 
 task: brew ## install taskfile
 	$(call brew_install,go-task)
-
-install: xcode asdf brew jq pre-commit sccache task ## install dependencies
 
 help: ## show this help
 	@echo ''
