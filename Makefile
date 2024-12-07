@@ -6,8 +6,9 @@
 
 # ENV VARS
 export SHELL := $(shell which sh)
+export ARCH := $(shell arch)
 export UNAME := $(shell uname -s)
-export ASDF_VERSION := v0.13.1
+export ASDF_VERSION := v0.14.1
 
 # check commands and OS
 ifeq ($(UNAME), Darwin)
@@ -26,7 +27,7 @@ RESET := $(shell tput -Txterm sgr0)
 
 # Usage: $(call check_bin,command_name)
 define check_bin
-	$(shell command -v $(1) 2>/dev/null)
+	! command -v $(1) >/dev/null 2>&1
 endef
 
 # Usage: $(call brew_install,package_name)
@@ -69,14 +70,16 @@ endif
 
 brew: xcode ## install homebrew
 ifeq ($(UNAME), Darwin)
-	@if [ -z "$(call check_bin,brew)" ]; then \
+	@if $(call check_bin,brew); then \
 		echo "Installing Homebrew..."; \
 		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
 	else \
 		echo "brew already installed."; \
 	fi
 else ifeq ($(UNAME), Linux)
-	@if [ -z "$(call check_bin,brew)" ] && [ "${ID_LIKE}" = "debian" ]; then \
+	@if [ "$(ARCH)" = "aarch64" ]; then \
+		echo "Homebrew on Linux is not supported on ARM processors."; \
+	elif $(call check_bin,brew) && [ "$(ID_LIKE)" = "debian" ]; then \
 		echo "Installing Homebrew..."; \
 		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
 	else \
@@ -87,7 +90,7 @@ else
 endif
 
 asdf: xcode ## install asdf
-	@if [ -z "$(call check_bin,asdf)" ]; then \
+	@if $(call check_bin,asdf); then \
 		echo "Installing asdf..."; \
 		git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch ${ASDF_VERSION}; \
 		echo "To use asdf, add the following to your shell rc (.bashrc/.zshrc):"; \
@@ -99,7 +102,7 @@ asdf: xcode ## install asdf
 	fi
 
 devbox: ## install devbox
-	@if [ -z "$(call check_bin,devbox)" ]; then \
+	@if $(call check_bin,devbox); then \
 		echo "Installing devbox..."; \
 		curl -fsSL https://get.jetpack.io/devbox | bash; \
 	else \
@@ -115,8 +118,19 @@ pre-commit: brew ## install pre-commit
 sccache: brew ## install sccache
 	$(call brew_install,sccache)
 
-task: brew ## install taskfile
+task: ## install taskfile
+ifeq ($(UNAME), Darwin)
 	$(call brew_install,go-task)
+else ifeq ($(UNAME), Linux)
+	@if $(call check_bin,task); then \
+		echo "Installing task..."; \
+		sh -c "$$(curl -sl https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin; \
+	else \
+		echo "task already installed."; \
+	fi
+else
+	@echo "task installation not supported on this OS."
+endif
 
 help: ## show this help
 	@echo ''
