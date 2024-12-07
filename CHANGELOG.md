@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/pythoninthegrass/mvp/compare/v1.1.0...v1.2.0) (2024-12-07)
+
+
+### Features
+
+* process-compose ([bc5ef0a](https://github.com/pythoninthegrass/mvp/commit/bc5ef0a3faeb4bbfe43653c731f4f442e440efff))
+
 ## [1.1.0](https://github.com/pythoninthegrass/mvp/compare/v1.0.0...v1.1.0) (2024-10-16)
 
 
