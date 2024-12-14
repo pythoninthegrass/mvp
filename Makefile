@@ -6,9 +6,8 @@
 
 # ENV VARS
 export SHELL := $(shell which sh)
-export ARCH := $(shell arch)
 export UNAME := $(shell uname -s)
-export ASDF_VERSION := v0.14.1
+export ASDF_VERSION := v0.13.1
 
 # check commands and OS
 ifeq ($(UNAME), Darwin)
@@ -26,8 +25,9 @@ CYAN := $(shell tput -Txterm setaf 6)
 RESET := $(shell tput -Txterm sgr0)
 
 # Usage: $(call check_bin,command_name)
+# Returns empty string if command not found, command path if found
 define check_bin
-	! command -v $(1) >/dev/null 2>&1
+	$(shell which $(1) 2>/dev/null)
 endef
 
 # Usage: $(call brew_install,package_name)
@@ -39,7 +39,7 @@ define brew_install
 			"go-task") binary_name="task" ;; \
 			*) binary_name="$(1)" ;; \
 		esac; \
-		if [ -z "$(call check_bin,$$binary_name)" ]; then \
+		if ! command -v $$binary_name >/dev/null 2>&1; then \
 			echo "Installing $(1)..."; \
 			brew install $(1); \
 		else \
@@ -52,9 +52,7 @@ endef
 
 # targets
 .PHONY: all
-all: help install ## run all targets
-
-install: xcode asdf brew devbox jq pre-commit sccache task ## install dependencies
+all: help asdf xcode brew jq pre-commit sccache task yq ## run all targets
 
 xcode: ## install xcode command line tools
 ifeq ($(UNAME), Darwin)
@@ -70,27 +68,34 @@ endif
 
 brew: xcode ## install homebrew
 ifeq ($(UNAME), Darwin)
-	@if $(call check_bin,brew); then \
+	@if ! command -v brew >/dev/null 2>&1; then \
 		echo "Installing Homebrew..."; \
 		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
 	else \
 		echo "brew already installed."; \
 	fi
 else ifeq ($(UNAME), Linux)
-	@if [ "$(ARCH)" = "aarch64" ]; then \
-		echo "Homebrew on Linux is not supported on ARM processors."; \
-	elif $(call check_bin,brew) && [ "$(ID_LIKE)" = "debian" ]; then \
-		echo "Installing Homebrew..."; \
-		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
+	@if [ "${ID_LIKE}" = "debian" ]; then \
+		if ! command -v brew >/dev/null 2>&1; then \
+			echo "Installing Homebrew..."; \
+			/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
+			echo ""; \
+			echo "To add Homebrew to your PATH, run these commands:"; \
+			echo 'eval "$$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'; \
+			echo 'Add to ~/.profile or ~/.bashrc:'; \
+			echo 'eval "$$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'; \
+		else \
+			echo "brew already installed."; \
+		fi \
 	else \
-		echo "brew already installed."; \
+		echo "brew not supported on this Linux distribution."; \
 	fi
 else
 	@echo "brew not supported."
 endif
 
 asdf: xcode ## install asdf
-	@if $(call check_bin,asdf); then \
+	@if ! command -v asdf >/dev/null 2>&1; then \
 		echo "Installing asdf..."; \
 		git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch ${ASDF_VERSION}; \
 		echo "To use asdf, add the following to your shell rc (.bashrc/.zshrc):"; \
@@ -99,14 +104,6 @@ asdf: xcode ## install asdf
 		echo ". $$HOME/.asdf/completions/asdf.bash"; \
 	else \
 		echo "asdf already installed."; \
-	fi
-
-devbox: ## install devbox
-	@if $(call check_bin,devbox); then \
-		echo "Installing devbox..."; \
-		curl -fsSL https://get.jetpack.io/devbox | bash; \
-	else \
-		echo "devbox already installed."; \
 	fi
 
 jq: brew ## install jq
@@ -118,19 +115,13 @@ pre-commit: brew ## install pre-commit
 sccache: brew ## install sccache
 	$(call brew_install,sccache)
 
-task: ## install taskfile
-ifeq ($(UNAME), Darwin)
+task: brew ## install taskfile
 	$(call brew_install,go-task)
-else ifeq ($(UNAME), Linux)
-	@if $(call check_bin,task); then \
-		echo "Installing task..."; \
-		sh -c "$$(curl -sl https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin; \
-	else \
-		echo "task already installed."; \
-	fi
-else
-	@echo "task installation not supported on this OS."
-endif
+
+yq: brew ## install yq
+	$(call brew_install,yq)
+
+install: xcode asdf brew jq pre-commit sccache task yq ## install dependencies
 
 help: ## show this help
 	@echo ''
