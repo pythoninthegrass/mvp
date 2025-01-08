@@ -1,0 +1,76 @@
+version: "3.0"
+
+set: ['e', 'u', 'pipefail']
+shopt: ['globstar']
+
+env:
+  ARCH: "amd64"
+  USERNAME: "ubuntu"
+  CLOUD_CONFIG: "{{.ROOT_DIR}}/cloud-init/cloud-init.ubuntu.yml"
+  OS_NAME: "ubuntu"
+  OS_VERSION: "jammy"
+  VM_NAME: "ubuntu-amd64"
+
+vars:
+
+tasks:
+  create:
+    desc: "Create an orbstack VM"
+    cmds:
+      - |
+        orb create \
+          -a "{{.ARCH}}" \
+          -u "{{.USERNAME}}" \
+          -c "{{.CLOUD_CONFIG}}" \
+          "{{.OS_NAME}}:{{.OS_VERSION}}" \
+          "{{.VM_NAME}}"
+    run: once
+    silent: true
+    ignore_error: true
+    status:
+      - orb list 2>/dev/null | grep -q "{{.VM_NAME}}"
+
+  start:
+    desc: "Start an orbstack VM"
+    cmds:
+      - orb start "{{.VM_NAME}}"
+    run: once
+    silent: true
+    preconditions:
+      - sh: >
+          orb list 2>/dev/null
+          | grep -q '^{{.VM_NAME}}\s'
+        msg: "VM doesn't exist"
+      - sh: >
+          orb list 2>/dev/null
+          | awk '$1=="{{.VM_NAME}}" && $2=="running" {exit 1}'
+        msg: "VM is already running"
+
+  stop:
+    desc: "Stop an orbstack VM"
+    cmds:
+      - orb stop "{{.VM_NAME}}"
+    run: once
+    silent: true
+    preconditions:
+      - sh: >
+          orb list 2>/dev/null
+          | grep -q '^{{.VM_NAME}}\s'
+        msg: "VM doesn't exist"
+      - sh: >
+          orb list 2>/dev/null
+          | awk '$1=="{{.VM_NAME}}" && $2=="stopped" {exit 1}'
+        msg: "VM is already stopped"
+
+  delete:
+    desc: "Delete an orbstack VM"
+    cmds:
+      - orb delete "{{.VM_NAME}}" -f
+    run: once
+    silent: true
+    ignore_error: true
+    preconditions:
+      - sh: >
+          orb list 2>/dev/null
+          | grep -q '^{{.VM_NAME}}\s'
+        msg: "VM doesn't exist"

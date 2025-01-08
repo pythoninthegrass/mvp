@@ -14,6 +14,9 @@ vars:
 includes:
   docker:
     taskfile: ./taskfiles/docker.yml
+  orbstack:
+    taskfile: ./taskfiles/orbstack.yml
+    aliases: ["orb"]
   poetry:
     taskfile: ./taskfiles/poetry.yml
   redis:

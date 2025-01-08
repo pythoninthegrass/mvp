@@ -8,16 +8,25 @@ timezone: "America/Chicago"
 hostname: ubuntu
 
 package_update: true      # default: true
-package_upgrade: false    # default: false  # TODO: set to true
+package_upgrade: true     # default: false
 # https://github.com/number5/cloud-init/blob/main/doc/examples/cloud-config-apt.txt#L21
-apt_get_command: ["apt-get", "--option=Dpkg::Options::=--force-confold", "--option=Dpkg::options::=--force-unsafe-io", "--assume-yes", "--quiet", "--no-install-recommends"]
+apt_get_command: [
+  "env",
+  "DEBIAN_FRONTEND=noninteractive",
+  "apt-get",
+  "--option=Dpkg::Options::=--force-confold",
+  "--option=Dpkg::options::=--force-unsafe-io",
+  "--assume-yes",
+  "--quiet",
+  "--no-install-recommends"
+]
 
 apt:
   sources:
-    deadsnakes.list:
-      source: deb http://ppa.launchpad.net/deadsnakes/ppa/ubuntu $RELEASE main
+    deadsnakes:
+      source: deb https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu $RELEASE main
       keyid: F23C5A6CF475977595C89F51BA6932366A755776
-    docker.list:
+    docker:
       source: deb https://download.docker.com/linux/ubuntu $RELEASE stable
       keyid: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
 
@@ -64,14 +73,14 @@ runcmd:
   - systemctl enable --now qemu-guest-agent.service
   - systemctl enable --now docker
   - systemctl enable --now redis-server
-  - runuser -l ubuntu -c "wget -O - https://github.com/pythoninthegrass.keys | sudo tee -a ~/.ssh/authorized_keys"
-  - runuser -l ubuntu -c "ssh-keyscan github.com >> ~/.ssh/known_hosts"
-  - runuser -l ubuntu -c "mkdir -p /home/ubuntu/git"
-  - runuser -l ubuntu -c "sudo chmod -R 0777 /home/ubuntu/git"
-  - runuser -l ubuntu -c "sudo chown -R ubuntu:ubuntu /home/ubuntu/git"
-  - runuser -l ansible -c "sudo touch /var/log/ansible.log"
-  - runuser -l ansible -c "sudo chown ansible:ansible /var/log/ansible.log"
-  - runuser -l ansible -c "sudo chmod 0777 /var/log/ansible.log"
+  - wget -O - https://github.com/pythoninthegrass.keys | sudo tee -a /home/ubuntu/.ssh/authorized_keys
+  - ssh-keyscan github.com >> /home/ubuntu/.ssh/known_hosts
+  - mkdir -p /home/ubuntu/git
+  - chmod -R 0777 /home/ubuntu/git
+  - chown -R ubuntu:ubuntu /home/ubuntu/git
+  - touch /var/log/ansible.log
+  - chown ansible:ansible /var/log/ansible.log
+  - chmod 0777 /var/log/ansible.log
   # * smoke test
   # - ansible all -m ping -i /etc/ansible/hosts
 
@@ -86,6 +95,7 @@ write_files:
     owner: ubuntu:ubuntu
     permissions: '0644'
     append: false
+    defer: true
     content: |
       # Verify that shell is interactive
       if [[ $- != *i* ]]; then return; fi
@@ -133,11 +143,13 @@ write_files:
 
   - path: /home/ubuntu/.bash_profile
     owner: ubuntu:ubuntu
+    defer: true
     content: |
       [[ -s ~/.bashrc ]] && source ~/.bashrc
 
   - path: /home/ubuntu/.gitignore
     owner: ubuntu:ubuntu
+    defer: true
     content: |
       .env
       .gitattributes
@@ -150,6 +162,7 @@ write_files:
 
   - path: /home/ubuntu/.gitconfig
     owner: ubuntu:ubuntu
+    defer: true
     content: |
       [core]
         excludesfile = /home/ubuntu/.gitignore
@@ -163,6 +176,7 @@ write_files:
 
   - path: /etc/ansible/hosts
     owner: ansible:ansible
+    defer: true
     content: |
       [all]
       localhost ansible_connection=local
@@ -225,16 +239,16 @@ write_files:
       }
 
 # TODO: QA
-ansible:
-  ansible_config: |
-    [defaults]
-    log_path                = /var/log/ansible.log
-    fact_caching            = memory
-  install_method: distro
-  package_name: ansible
-  pull:
-    url: "https://github.com/pythoninthegrass/multipass_poc.git"
-    playbook_name: "tasks/git.yml"
+# ansible:
+#   ansible_config: |
+#     [defaults]
+#     log_path                = /var/log/ansible.log
+#     fact_caching            = memory
+#   install_method: distro
+#   package_name: ansible
+#   pull:
+#     url: "https://github.com/pythoninthegrass/multipass_poc.git"
+#     playbook_name: "tasks/git.yml"
 
 bootcmd:
   - printf "[Resolve]\nDNS=1.1.1.1" > /etc/systemd/resolved.conf
