@@ -50,6 +50,7 @@ packages:
   - software-properties-common
   - tree
   - vim
+  - wget
 
 groups:
   - docker
