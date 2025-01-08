@@ -6,7 +6,7 @@ shopt: ['globstar']
 env:
   ARCH: "amd64"
   USERNAME: "ubuntu"
-  CLOUD_CONFIG: "{{.ROOT_DIR}}/cloud-init/cloud-init.ubuntu.yml"
+  CLOUD_CONFIG: "{{.ROOT_DIR}}/cloud-init.yml"
   OS_NAME: "ubuntu"
   OS_VERSION: "jammy"
   VM_NAME: "ubuntu-amd64"
@@ -30,6 +30,13 @@ tasks:
     status:
       - orb list 2>/dev/null | grep -q "{{.VM_NAME}}"
 
+  list:
+    desc: "List orbstack VMs"
+    cmds:
+      - orb list
+    run: once
+    silent: true
+
   start:
     desc: "Start an orbstack VM"
     cmds:
@@ -45,6 +52,14 @@ tasks:
           orb list 2>/dev/null
           | awk '$1=="{{.VM_NAME}}" && $2=="running" {exit 1}'
         msg: "VM is already running"
+
+  exec:
+    desc: "SSH into an orbstack VM"
+    cmds:
+      - ssh "{{.VM_NAME}}@orb"
+    run: once
+    silent: true
+    ignore_error: true
 
   stop:
     desc: "Stop an orbstack VM"
@@ -74,3 +89,9 @@ tasks:
           orb list 2>/dev/null
           | grep -q '^{{.VM_NAME}}\s'
         msg: "VM doesn't exist"
+
+  update:
+    desc: "Update orbstack app"
+    cmds:
+      - orb update
+    run: once
