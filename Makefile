@@ -70,7 +70,7 @@ brew: xcode ## install homebrew
 ifeq ($(UNAME), Darwin)
 	@if ! command -v brew >/dev/null 2>&1; then \
 		echo "Installing Homebrew..."; \
-		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
+		NONINTERACTIVE=1 /bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
 	else \
 		echo "brew already installed."; \
 	fi
@@ -78,7 +78,7 @@ else ifeq ($(UNAME), Linux)
 	@if [ "${ID_LIKE}" = "debian" ]; then \
 		if ! command -v brew >/dev/null 2>&1; then \
 			echo "Installing Homebrew..."; \
-			/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
+			NONINTERACTIVE=1 /bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
 			echo ""; \
 			echo "To add Homebrew to your PATH, run these commands:"; \
 			echo 'eval "$$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'; \
