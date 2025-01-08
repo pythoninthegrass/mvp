@@ -81,6 +81,8 @@ runcmd:
   - touch /var/log/ansible.log
   - chown ansible:ansible /var/log/ansible.log
   - chmod 0777 /var/log/ansible.log
+  - apt-get update
+  - apt-get install -y python3.11=3.11.11-1+jammy1 python3.11-dev=3.11.11-1+jammy1
   # * smoke test
   # - ansible all -m ping -i /etc/ansible/hosts
 
