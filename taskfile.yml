@@ -31,12 +31,14 @@ tasks:
   install-devbox:
     desc: "Install devbox"
     cmds:
-      - |
-        if ! [[ $(command -v devbox 2>/dev/null) ]]; then
-          curl -fsSL https://get.jetify.com/devbox | bash
-        fi
+      - curl -fsSL https://get.jetify.com/devbox | bash
     run: once
     silent: true
+    environment:
+      FORCE: 1
+      INSTALL_DIR: "{{.HOME}}/.local/bin"
+    status:
+      - command -v devbox 2>/dev/null
 
   install:
     desc: "Install project dependencies"
