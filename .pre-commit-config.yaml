@@ -21,6 +21,10 @@ repos:
         files: \.(py|sh)$
       - id: check-docstring-first
         files: \.(py)$
+        exclude: |
+            (?x)^(
+                scratch.py
+            )$
       - id: check-merge-conflict
       - id: check-shebang-scripts-are-executable
         files: \.(py|sh)$
