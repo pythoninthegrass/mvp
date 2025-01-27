@@ -7,7 +7,7 @@
 # ENV VARS
 export SHELL := $(shell which sh)
 export UNAME := $(shell uname -s)
-export ASDF_VERSION := v0.13.1
+export ASDF_VERSION := v0.15.0
 
 # check commands and OS
 ifeq ($(UNAME), Darwin)
@@ -75,7 +75,7 @@ ifeq ($(UNAME), Darwin)
 		echo "brew already installed."; \
 	fi
 else ifeq ($(UNAME), Linux)
-	@if [ "${ID_LIKE}" = "debian" ]; then \
+	@if [ "${ID}" = "debian" ] || [ "${ID_LIKE}" = "debian" ]; then \
 		if ! command -v brew >/dev/null 2>&1; then \
 			echo "Installing Homebrew..."; \
 			NONINTERACTIVE=1 /bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \

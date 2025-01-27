@@ -1,7 +1,7 @@
-# syntax=docker/dockerfile:1.7
+# syntax=docker/dockerfile:1.7.0
 
 # full semver just for python base image
-ARG PYTHON_VERSION=3.11.9
+ARG PYTHON_VERSION=3.11.11
 
 FROM python:${PYTHON_VERSION}-slim-bullseye AS builder
 
@@ -9,8 +9,8 @@ FROM python:${PYTHON_VERSION}-slim-bullseye AS builder
 ARG DEBIAN_FRONTEND=noninteractive
 
 # update apt-get repos and install dependencies
-RUN apt-get -qq update && apt-get -qq install \
-    --no-install-recommends -y \
+RUN apt-get -qq update \
+    && apt-get -qq install --no-install-recommends -y \
     curl \
     gcc \
     libpq-dev \
@@ -24,7 +24,7 @@ ENV PIP_DEFAULT_TIMEOUT=100
 
 # poetry env vars
 ENV POETRY_HOME="/opt/poetry"
-ENV POETRY_VERSION=1.8.3
+ENV POETRY_VERSION=1.8.5
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 ENV POETRY_NO_INTERACTION=1
 
@@ -32,10 +32,13 @@ ENV POETRY_NO_INTERACTION=1
 ENV VENV="/opt/venv"
 ENV PATH="$POETRY_HOME/bin:$VENV/bin:$PATH"
 
+# create app directory and set as working directory
 WORKDIR /app
 
+# copy dependencies
 COPY requirements.txt requirements.txt
 
+# install poetry and dependencies
 RUN python -m venv $VENV \
     && . "${VENV}/bin/activate" \
     && python -m pip install "poetry==${POETRY_VERSION}" \
@@ -43,7 +46,7 @@ RUN python -m venv $VENV \
 
 FROM python:${PYTHON_VERSION}-slim-bullseye AS dev
 
-ENV HOSTNAME="${HOST:-localhost}"
+# setup path
 ENV VENV="/opt/venv"
 ENV PATH="${VENV}/bin:${VENV}/lib/python${PYTHON_VERSION}/site-packages:/usr/local/bin:${HOME}/.local/bin:/bin:/usr/bin:/usr/share/doc:$PATH"
 
@@ -61,8 +64,8 @@ ENV WEB_CONCURRENCY=2
 ARG DEBIAN_FRONTEND=noninteractive
 
 # install dependencies
-RUN apt-get -qq update && apt-get -qq install \
-    --no-install-recommends -y \
+RUN apt-get -qq update \
+    && apt-get -qq install --no-install-recommends -y \
     bat \
     curl \
     dpkg \
@@ -73,6 +76,7 @@ RUN apt-get -qq update && apt-get -qq install \
     p7zip \
     perl \
     shellcheck \
+    sudo \
     tldr \
     tree \
     && rm -rf /var/lib/apt/lists/*
@@ -85,28 +89,26 @@ ARG USER_GID=$USER_UID
 RUN groupadd --gid $USER_GID $USER_NAME \
     && useradd --uid $USER_UID --gid $USER_GID -m $USER_NAME
 
+RUN echo "$USER_NAME ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER_NAME \
+    && chmod 0440 /etc/sudoers.d/$USER_NAME
+
+# copy virtual environment from builder stage
 COPY --from=builder --chown=${USER_NAME}:${USER_GROUP} $VENV $VENV
 
 # qol: tooling
 RUN <<EOF
 #!/usr/bin/env bash
-# gh
-curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-apt-get update && apt-get install --no-install-recommends gh -y
-apt-get remove dpkg -y
-rm -rf /var/lib/apt/lists/*
-
 # fzf
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 yes | ~/.fzf/install
 EOF
 
+# switch to non-root user
 USER $USER_NAME
 
 # qol: .bashrc
-RUN tee -a "$HOME/.bashrc" <<EOF
+RUN tee -a "$HOME/.bashrc" <<"EOF"
+
 # shared history
 HISTFILE=/var/tmp/.bash_history
 HISTFILESIZE=100
@@ -114,16 +116,28 @@ HISTSIZE=100
 
 stty -ixon
 
+# fzf
 [ -f ~/.fzf.bash ] && . ~/.fzf.bash
+
+# asdf
+# https://asdf-vm.com/guide/getting-started.html
+export ASDF_DIR="$HOME/.asdf"
+[[ -f "${ASDF_DIR}/asdf.sh" ]] && . "${ASDF_DIR}/asdf.sh"
+
+# homebrew
+export BREW_PREFIX="/home/linuxbrew/.linuxbrew/bin"
+[[ -f "${BREW_PREFIX}/brew" ]] && eval "$(${BREW_PREFIX}/brew shellenv)"
 
 # aliases
 alias ..='cd ../'
 alias ...='cd ../../'
 alias ll='ls -la --color=auto'
+
 EOF
 
 FROM dev AS runner
 
+# change working directory
 WORKDIR /app
 
 # $PATH
@@ -132,6 +146,8 @@ ENV PATH=$VENV_PATH/bin:$HOME/.local/bin:$PATH
 # port needed by app
 EXPOSE 8000
 
+# run container indefinitely
 CMD ["sleep", "infinity"]
 
-LABEL org.opencontainers.image.title="mvp"
+# metadata
+LABEL org.opencontainers.image.title="python-class"

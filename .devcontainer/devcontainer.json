@@ -30,13 +30,12 @@
         "foxundermoon.shell-format",
         "GitHub.copilot-chat",
         "GitHub.copilot",
-        "jetpack-io.devbox",
         "mads-hartmann.bash-ide-vscode",
         "mechatroner.rainbow-csv",
         "ms-azuretools.vscode-docker",
+        "ms-python.debugpy",
         "ms-python.python",
         "ms-vscode.atom-keybindings",
-        "redhat.ansible",
         "redhat.vscode-yaml",
         "ryu1kn.partial-diff",
         "timonwong.shellcheck",
@@ -50,7 +49,6 @@
     "ghcr.io/devcontainers/features/sshd:1": {},
     "ghcr.io/joshuanianji/devcontainer-features/github-cli-persistence:1": {},
     "ghcr.io/audacioustux/devcontainers/taskfile:1": {},
-    "ghcr.io/nikobockerman/devcontainer-features/poetry-persistent-cache:1": {},
     "ghcr.io/va-h/devcontainers-features/uv:1": {}
   },
   "forwardPorts": [
