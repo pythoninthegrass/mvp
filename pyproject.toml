@@ -128,9 +128,13 @@ fixable = ["A", "B", "C", "D", "E", "F", "G", "I", "N", "Q", "S", "T", "W", "ANN
 
 [tool.ruff.lint.isort]
 from-first = false
-lines-after-imports = 2
-lines-between-types = 0
 no-sections = true
+
+[tool.ruff.lint.empty-lines]
+max-blank-lines-after-class = 1
+max-blank-lines-after-function = 1
+min-after-class = 2
+min-after-function = 2
 
 [tool.ruff.lint.flake8-quotes]
 docstring-quotes = "double"
