@@ -105,38 +105,35 @@ line-ending = "lf"
 quote-style = "preserve"
 
 [tool.ruff.lint]
-# Enable pycodestyle (`E`), Pyflakes (`F`), and isort (`I`) by default.
 select = [
+    # pycodestyle
+    "E",
     # Pyflakes
     "F",
-    # Pycodestyle
-    "E",
-    "W",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
     # isort
-    "I001",
-    "I002"
+    "I",
 ]
-# Skip unused variable rules
-ignore = []
-extend-ignore = ["D203", "E203", "E251", "E266", "E401", "E402", "E501", "F401", "F403"]
+ignore = ["D203", "E203", "E251", "E266", "E401", "E402", "E501", "F401", "F403"]
 
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 # Allow autofix for all enabled rules (when `--fix`) is provided.
-fixable = ["A", "B", "C", "D", "E", "F", "G", "I", "N", "Q", "S", "T", "W", "ANN", "ARG", "BLE", "COM", "DJ", "DTZ", "EM", "ERA", "EXE", "FBT", "ICN", "INP", "ISC", "NPY", "PD", "PGH", "PIE", "PL", "PT", "PTH", "PYI", "RET", "RSE", "RUF", "SIM", "SLF", "TCH", "TID", "TRY", "UP", "YTT"]
+fixable = ["A", "B", "C", "D", "E", "F", "G", "I", "N", "Q", "S", "T", "W", "ANN", "ARG", "BLE", "COM", "DJ", "DTZ", "EM", "ERA", "EXE", "FBT", "ICN", "INP", "ISC", "NPY", "PD", "PGH", "PIE", "PL", "PT", "PTH", "PYI", "RET", "RSE", "RUF", "SIM", "SLF", "TID", "TRY", "UP", "YTT"]
 
 # unfixable = []
 
 [tool.ruff.lint.isort]
+combine-as-imports = true
 from-first = false
 no-sections = true
-
-[tool.ruff.lint.empty-lines]
-max-blank-lines-after-class = 1
-max-blank-lines-after-function = 1
-min-after-class = 2
-min-after-function = 2
+order-by-type = true
 
 [tool.ruff.lint.flake8-quotes]
 docstring-quotes = "double"
