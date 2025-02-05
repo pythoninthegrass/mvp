@@ -21,6 +21,8 @@ includes:
     taskfile: ./taskfiles/poetry.yml
   redis:
     taskfile: ./taskfiles/redis.yml
+  uv:
+    taskfile: ./taskfiles/uv.yml
 
 tasks:
   default:
