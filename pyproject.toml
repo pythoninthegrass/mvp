@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mvp"
-version = "1.1.0"
+version = "1.2.0"
 description = ""
 authors = ["pythoninthegrass <4097471+pythoninthegrass@users.noreply.github.com>"]
 license = "Unlicense"
