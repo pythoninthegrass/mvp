@@ -1,0 +1,18 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Renovate configuration that updates dependencies every Saturday at 10:00 AM Central Time",
+  "lockFileMaintenance": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "matchManagers": ["pip_requirements"],
+      "enabled": true
+    }
+  ],
+  "schedule": [
+    "* 10 * * SAT"
+  ],
+  "prConcurrentLimit": 5,
+  "rangeStrategy": "update-lockfile"
+}
