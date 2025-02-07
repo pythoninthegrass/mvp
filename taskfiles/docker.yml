@@ -23,16 +23,24 @@ tasks:
     cmds:
       - |
         docker network create \
-        --driver bridge \
-        app-tier
+          --driver bridge \
+          app-tier
+    status:
+      - |
+        docker network ls --format \{\{.Name\}\} \
+          | grep -q '^app-tier$'
 
   vol:
     desc: "Create docker volume"
     cmds:
       - |
         docker volume create \
-        --driver local \
-        {{.SERVICE}}-vol
+          --driver local \
+          {{.SERVICE}}-vol
+    status:
+      - |
+        docker volume ls --format \{\{.Name\}\} \
+          | grep -q '^{{.SERVICE}}-vol$'
 
   build:
     desc: "Build the docker image"
@@ -45,11 +53,11 @@ tasks:
         task docker:build
     cmds:
       - |
-        if [[ -z "{{.CLI_ARGS}}" ]]; then
-          {{.BUILD}} {{.DOCKERFILE}} {{.SERVICE}}
-        else
-          {{.BUILD}} {{.CLI_ARGS}} {{.DOCKERFILE}} {{.SERVICE}}
-        fi
+        docker build \
+          -f {{.DOCKERFILE}} \
+          -t {{.SERVICE}} \
+          --platform {{.ARCH}} \
+          .
 
   login:
     desc: "Login to the container registry"
@@ -60,6 +68,9 @@ tasks:
           --password-stdin {{.REGISTRY_URL}}
     run: once
     silent: true
+    status:
+      - |
+        jq -e '.auths | keys[] | select(contains("{{.REGISTRY_URL}}"))' ~/.docker/config.json
 
   push:
     desc: "Push the docker image to the registry"
