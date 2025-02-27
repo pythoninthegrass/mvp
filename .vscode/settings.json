@@ -15,5 +15,15 @@
   // https://github.com/astral-sh/ruff-vscode
   "python.analysis.ignore": [
     "*"
-  ]
+  ],
+    "[markdown]": {
+      "editor.formatOnSave": true,
+      "editor.quickSuggestions": {
+        "comments": "off",
+        "strings": "off",
+        "other": "off"
+      },
+      "files.trimTrailingWhitespace": false,
+      "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    },
 }

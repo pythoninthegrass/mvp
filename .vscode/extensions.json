@@ -3,6 +3,7 @@
     "aaron-bond.better-comments",
     "charliermarsh.ruff",
     "codezombiech.gitignore",
+    "DavidAnson.vscode-markdownlint",
     "eamodio.gitlens",
     "EditorConfig.EditorConfig",
     "foxundermoon.shell-format",
