@@ -3,7 +3,7 @@
     "ansible-lint@latest",
     "ansible@latest",
     "asdf-vm@latest",
-    "docker@latest",
+    "docker@20.10.26",
     "gh@latest",
     "git@latest",
     "gnumake@latest",
