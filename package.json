@@ -1,8 +1,6 @@
 {
   "devDependencies": {
-    "@nxlv/python": "^20.1.0",
-    "cz-conventional-changelog": "^3.3.0",
-    "nx": "20.2.2"
+    "cz-conventional-changelog": "^3.3.0"
   },
   "config": {
     "commitizen": {
