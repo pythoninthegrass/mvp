@@ -1,5 +1,9 @@
 version: "0.5"
 
+is_strict: true
+
+disable_env_expansion: true
+
 log_location: /tmp/process-compose.log
 log_level: info     # trace / debug / info / warn / error / fatal / panic
 log_configuration:
@@ -8,10 +12,6 @@ log_configuration:
     max_age_days: 5 # age in days to keep a logfile
     max_backups: 3  # number of rolled files to keep
     compress: true
-
-is_strict: true
-
-disable_env_expansion: true
 
 processes:
   flask:
@@ -42,11 +42,11 @@ processes:
     is_tty: false
     environment:
       - CONTAINER_NAME=${CONTAINER_NAME:-devbox-postgres}
-      - VERSION=${VERSION:-16.3}
+      - VERSION=${VERSION:-17.4}
       - PORT=${PORT:-5432}
       - POSTGRES_DB=${DB_NAME:-postgres}
       - POSTGRES_USER=${DB_USER:-postgres}
-      - POSTGRES_PASSWORD=${DB_PASS?}
+      - POSTGRES_PASSWORD=${DB_PASS:-postgres}
     readiness_probe:
       exec:
         command: >
