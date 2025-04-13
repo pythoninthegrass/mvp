@@ -17,8 +17,6 @@ includes:
   orbstack:
     taskfile: ./taskfiles/orbstack.yml
     aliases: ["orb"]
-  poetry:
-    taskfile: ./taskfiles/poetry.yml
   redis:
     taskfile: ./taskfiles/redis.yml
   uv:
