@@ -23,22 +23,30 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
   * [Further Reading](#further-reading)
 
 ## Setup
+
 ### Minimum requirements
+
 * [Python 3.11](https://www.python.org/downloads/)
 
 ### Recommended requirements
+
 * [devbox](https://www.jetpack.io/devbox/docs/quickstart/)
 * [task](https://taskfile.dev/#/installation)
 
 ## Development
+
 ### Devbox
-Devbox takes care of setting up a dev environment automatically. 
+
+Devbox takes care of setting up a dev environment automatically.
 
 Under the hood it uses [Nix Package Manager](https://search.nixos.org/packages).
 
 ```bash
+# install base dependencies
+make install
+
 # install devbox
-./bootstrap
+task install-devbox
 
 # enter dev environment w/deps
 devbox shell
