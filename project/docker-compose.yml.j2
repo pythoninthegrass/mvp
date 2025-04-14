@@ -1,7 +1,7 @@
 services:
   app:
-    container_name: mvp-app
-    hostname: mvp
+    container_name: {{ python_package_distribution_name }}-app
+    hostname: {{ python_package_distribution_name }}
     platform: linux/amd64             # linux/amd64 / linux/arm64/v8
     tty: true                         # false for `entrypoint` in Dockerfile
     stdin_open: true                  # false for `entrypoint` in Dockerfile

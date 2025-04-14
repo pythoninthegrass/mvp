@@ -1,6 +1,7 @@
 {
   "packages": {
     "asdf-vm": "latest",
+    "copier":  "latest",
     "gh":      "latest",
     "git":     "latest",
     "glib":    "latest",

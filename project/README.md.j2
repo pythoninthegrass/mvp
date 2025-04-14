@@ -3,9 +3,11 @@
 {{ project_description }}
 
 ## Summary
+
 Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
 
 **Table of Contents**
+
 * [{{ project_name }}](#{{ project_name | slugify }})
   * [Summary](#summary)
   * [Setup](#setup)
@@ -21,22 +23,30 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
   * [Further Reading](#further-reading)
 
 ## Setup
+
 ### Minimum requirements
+
 * [Python 3.11](https://www.python.org/downloads/)
 
 ### Recommended requirements
+
 * [devbox](https://www.jetpack.io/devbox/docs/quickstart/)
 * [task](https://taskfile.dev/#/installation)
 
 ## Development
+
 ### Devbox
-Devbox takes care of setting up a dev environment automatically. 
+
+Devbox takes care of setting up a dev environment automatically.
 
 Under the hood it uses [Nix Package Manager](https://search.nixos.org/packages).
 
 ```bash
+# install base dependencies
+make install
+
 # install devbox
-./bootstrap
+task install-devbox
 
 # enter dev environment w/deps
 devbox shell
@@ -52,6 +62,7 @@ devbox run test
 ```
 
 ### Taskfile
+
 ```bash
 λ task
 task: Available tasks for this project:
@@ -68,6 +79,7 @@ task: Available tasks for this project:
 
 {% if python_package_command_line_name %}
 ### CLI Usage
+
 After installation, you can use the `{{ python_package_command_line_name }}` command:
 
 ```bash
@@ -80,6 +92,7 @@ After installation, you can use the `{{ python_package_command_line_name }}` com
 {% endif %}
 
 ## TODO
+
 * [Open Issues](https://{{ repository_provider }}/{{ repository_namespace }}/{{ repository_name }}/issues)
 * QA [Ansible playbook](ansible/playbook.yml)
   * Test
@@ -89,6 +102,7 @@ After installation, you can use the `{{ python_package_command_line_name }}` com
 * CI/CD
 
 ## Further Reading
+
 * [python](https://www.python.org/)
 * [asdf](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)
 * [poetry](https://python-poetry.org/docs/)

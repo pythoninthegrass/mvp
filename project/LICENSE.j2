@@ -73,6 +73,69 @@ cooperation with the community in the case of network server software.
       and distribution as defined by Sections 1 through 9 of this document.
 
       [Full license text - see complete license at http://www.apache.org/licenses/LICENSE-2.0.txt]
+{% elif copyright_license == 'CC-BY-4.0' -%}
+Creative Commons Attribution 4.0 International License
+
+Copyright (c) {{ copyright_date }} {{ copyright_holder }}
+
+This work is licensed under the Creative Commons Attribution 4.0 International License.
+
+To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+[Full license text - see complete license at https://creativecommons.org/licenses/by/4.0/legalcode]
+{% elif copyright_license == 'CC0-1.0' -%}
+Creative Commons Legal Code
+CC0 1.0 Universal
+
+CREATIVE COMMONS CORPORATION IS NOT A LAW FIRM AND DOES NOT PROVIDE LEGAL SERVICES. DISTRIBUTION OF THIS DOCUMENT DOES NOT CREATE AN ATTORNEY-CLIENT RELATIONSHIP. CREATIVE COMMONS PROVIDES THIS INFORMATION ON AN "AS-IS" BASIS. CREATIVE COMMONS MAKES NO WARRANTIES REGARDING THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS PROVIDED HEREUNDER, AND DISCLAIMS LIABILITY FOR DAMAGES RESULTING FROM THE USE OF THIS DOCUMENT OR THE INFORMATION OR WORKS PROVIDED HEREUNDER.
+
+Statement of Purpose
+
+The laws of most jurisdictions throughout the world automatically confer exclusive Copyright and Related Rights (defined below) upon the creator and subsequent owner(s) (each and all, an "owner") of an original work of authorship and/or a database (each, a "Work").
+
+Certain owners wish to permanently relinquish those rights to a Work for the purpose of contributing to a commons of creative, cultural and scientific works ("Commons") that the public can reliably and without fear of later claims of infringement build upon, modify, incorporate in other works, reuse and redistribute as freely as possible in any form whatsoever and for any purposes, including without limitation commercial purposes. These owners may contribute to the Commons to promote the ideal of a free culture and the further production of creative, cultural and scientific works, or to gain reputation or greater distribution for their Work in part through the use and efforts of others.
+
+For more information, please see: http://creativecommons.org/publicdomain/zero/1.0/
+{% elif copyright_license == 'GPL-3.0' -%}
+GNU GENERAL PUBLIC LICENSE
+Version 3, 29 June 2007
+
+Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+Everyone is permitted to copy and distribute verbatim copies
+of this license document, but changing it is not allowed.
+
+Preamble
+
+The GNU General Public License is a free, copyleft license for
+software and other kinds of works.
+
+[Full license text - see complete license at https://www.gnu.org/licenses/gpl-3.0.txt]
+{% elif copyright_license == 'MPL-2.0' -%}
+Mozilla Public License Version 2.0
+==================================
+
+1. Definitions
+--------------
+
+1.1. "Contributor"
+    means each individual or legal entity that creates, contributes to
+    the creation of, or owns Covered Software.
+
+[Full license text - see complete license at https://www.mozilla.org/en-US/MPL/2.0/]
+{% elif copyright_license == 'WTFPL' -%}
+        DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+                    Version 2, December 2004
+
+ Copyright (C) {{ copyright_date }} {{ copyright_holder }}
+
+ Everyone is permitted to copy and distribute verbatim or modified
+ copies of this license document, and changing it is allowed as long
+ as the name is changed.
+
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+  0. You just DO WHAT THE FUCK YOU WANT TO.
 {% else -%}
 License: {{ copyright_license }}
 

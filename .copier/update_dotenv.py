@@ -4,9 +4,9 @@ This script updates the .env file with values from the Copier answers.
 It allows the .env file to be a regular file (not a template) that works with or without Copier.
 """
 
-from pathlib import Path
 import json
 import yaml
+from pathlib import Path
 
 # Update the .env file with the answers from the .copier-answers.yml file
 # without using Jinja2 templates in the .env file, this way the code works as is
@@ -39,10 +39,7 @@ for line in env_content.splitlines():
     for key, value in answers.items():
         upper_key = key.upper()
         if line.startswith(f"{upper_key}="):
-            if isinstance(value, str) and " " in value:
-                content = f'{upper_key}="{value}"'
-            else:
-                content = f"{upper_key}={value}"
+            content = f'{upper_key}="{value}"' if isinstance(value, str) and " " in value else f"{upper_key}={value}"
             lines.append(content)
             line_updated = True
             break
