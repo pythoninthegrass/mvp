@@ -1,0 +1,96 @@
+# {{ project_name }}
+
+{{ project_description }}
+
+## Summary
+Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
+
+**Table of Contents**
+* [{{ project_name }}](#{{ project_name | slugify }})
+  * [Summary](#summary)
+  * [Setup](#setup)
+    * [Minimum requirements](#minimum-requirements)
+    * [Recommended requirements](#recommended-requirements)
+  * [Development](#development)
+    * [Devbox](#devbox)
+    * [Taskfile](#taskfile)
+{% if python_package_command_line_name %}
+    * [CLI Usage](#cli-usage)
+{% endif %}
+  * [TODO](#todo)
+  * [Further Reading](#further-reading)
+
+## Setup
+### Minimum requirements
+* [Python 3.11](https://www.python.org/downloads/)
+
+### Recommended requirements
+* [devbox](https://www.jetpack.io/devbox/docs/quickstart/)
+* [task](https://taskfile.dev/#/installation)
+
+## Development
+### Devbox
+Devbox takes care of setting up a dev environment automatically. 
+
+Under the hood it uses [Nix Package Manager](https://search.nixos.org/packages).
+
+```bash
+# install devbox
+./bootstrap
+
+# enter dev environment w/deps
+devbox shell
+
+# run repl
+python
+
+# exit dev environment
+exit
+
+# run tests
+devbox run test
+```
+
+### Taskfile
+```bash
+λ task
+task: Available tasks for this project:
+* checkbash:                Check bash scripts
+* default:                  Default task
+* format:                   Run formatters
+* install:                  Install project dependencies
+* install-devbox:           Install devbox
+* lint:                     Run linters
+* pre-commit:               Run pre-commit hooks
+* pyclean:                  Remove .pyc and __pycache__
+* test:                     Run tests
+```
+
+{% if python_package_command_line_name %}
+### CLI Usage
+After installation, you can use the `{{ python_package_command_line_name }}` command:
+
+```bash
+# Show help
+{{ python_package_command_line_name }} --help
+
+# Run the main command
+{{ python_package_command_line_name }} run
+```
+{% endif %}
+
+## TODO
+* [Open Issues](https://{{ repository_provider }}/{{ repository_namespace }}/{{ repository_name }}/issues)
+* QA [Ansible playbook](ansible/playbook.yml)
+  * Test
+    * macOS
+    * Ubuntu
+* Write boilerplate pytest tests
+* CI/CD
+
+## Further Reading
+* [python](https://www.python.org/)
+* [asdf](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)
+* [poetry](https://python-poetry.org/docs/)
+* [docker-compose](https://docs.docker.com/compose/install/)
+* [pre-commit hooks](https://pre-commit.com/)
