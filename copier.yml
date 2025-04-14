@@ -13,6 +13,9 @@ _jinja_extensions:
 - extensions.py:SlugifyExtension
 _skip_if_exists:
 - CHANGELOG.md
+_answers_file: .copier/.copier-answers.yml
+_tasks:
+  - ["{{ _copier_python }}", .copier/update_dotenv.py]
 
 # PROMPT --------------------------------
 project_name:
@@ -22,7 +25,6 @@ project_name:
 project_description:
   type: str
   help: Your project description
-  default: "Minimum Viable Python Template"
 
 author_fullname:
   type: str
@@ -37,7 +39,6 @@ author_email:
 author_username:
   type: str
   help: Your username (e.g. on GitHub)
-  default: "pythoninthegrass"
 
 repository_provider:
   type: str
