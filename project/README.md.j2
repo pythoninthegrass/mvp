@@ -1,0 +1,134 @@
+# {{ project_name }}
+
+{% if repository_provider == "github.com" -%}
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/{{ repository_namespace }}/{{ repository_name }})](https://github.com/{{ repository_namespace }}/{{ repository_name }}/releases)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/{{ repository_namespace }}/{{ repository_name }}/pytest.yml?branch=main&label=tests)](https://github.com/{{ repository_namespace }}/{{ repository_name }}/actions/workflows/pytest.yml)
+{% endif -%}
+
+**{{ project_description }}**
+
+## Summary
+Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
+
+**Table of Contents**
+* [{{ project_name }}](#{{ project_name | slugify }})
+  * [Summary](#summary)
+  * [Setup](#setup)
+    * [Minimum requirements](#minimum-requirements)
+    * [Recommended requirements](#recommended-requirements)
+  * [Development](#development)
+    {% if use_devbox -%}
+    * [Devbox](#devbox)
+    {% endif -%}
+    {% if use_taskfile -%}
+    * [Taskfile](#taskfile)
+    {% endif -%}
+    * [Tilt](#tilt)
+  * [TODO](#todo)
+  * [Further Reading](#further-reading)
+
+## Setup
+### Minimum requirements
+* [Python {{ python_min_version }}](https://www.python.org/downloads/)
+
+### Recommended requirements
+{% if use_devbox -%}
+* [devbox](https://www.jetpack.io/devbox/docs/quickstart/)
+{% endif -%}
+{% if use_taskfile -%}
+* [task](https://taskfile.dev/#/installation)
+{% endif -%}
+
+## Development
+{% if use_devbox -%}
+### Devbox
+Devbox takes care of setting up a dev environment automatically. 
+
+Under the hood it uses [Nix Package Manager](https://search.nixos.org/packages).
+
+```bash
+# install devbox
+./bootstrap
+
+# enter dev environment w/deps
+devbox shell
+
+# run repl
+python
+
+# exit dev environment
+exit
+
+# run tests
+devbox run test
+```
+{% endif -%}
+
+{% if use_taskfile -%}
+### Taskfile
+```bash
+λ task
+task: Available tasks for this project:
+* checkbash:                Check bash scripts
+* default:                  Default task
+* format:                   Run formatters
+* install:                  Install project dependencies
+* install-devbox:           Install devbox
+* lint:                     Run linters
+* pre-commit:               Run pre-commit hooks
+* pyclean:                  Remove .pyc and __pycache__
+* test:                     Run tests
+* docker:build:             Build the docker image                                                     (aliases: docker:build)
+* docker:down:              Stop and remove containers, networks, and volumes with docker compose      (aliases: docker:down)
+* docker:exec:              Shell into a running container                                             (aliases: docker:exec)
+* docker:login:             Login to the container registry                                            (aliases: docker:login)
+* docker:logs:              Follow the logs of a running container                                     (aliases: docker:logs)
+* docker:net:               Create docker network                                                      (aliases: docker:net)
+* docker:prune:             Prune docker                                                               (aliases: docker:prune)
+* docker:push:              Push the docker image to the registry                                      (aliases: docker:push)
+* docker:stop:              Stop the project with docker compose                                       (aliases: docker:stop)
+* docker:up:                Start the project with docker compose                                      (aliases: docker:up)
+* docker:vol:               Create docker volume                                                       (aliases: docker:vol)
+* poetry:add-pypi:          Add test-pypi repository                                                   (aliases: poetry:add-pypi)
+* poetry:build:             Build the poetry bin                                                       (aliases: poetry:build)
+* poetry:bump-semver:       Bump the project semantic version                                          (aliases: poetry:bump-semver)
+* poetry:default:           Default task                                                               (aliases: poetry:default, poetry, poetry)
+* poetry:export-reqs:       Export requirements.txt                                                    (aliases: poetry:export-reqs)
+* poetry:install:           Install project dependencies                                               (aliases: poetry:install)
+* poetry:publish:           Publish the poetry bin                                                     (aliases: poetry:publish)
+* poetry:update-deps:       Update dependencies                                                        (aliases: poetry:update-deps)
+```
+{% endif -%}
+
+### Tilt
+```bash
+minikube start --memory=2048 --cpus=2 --kubernetes-version=v1.28.3 -p minikube
+git clone https://github.com/tilt-dev/tilt-example-python
+cd tilt-example-python/3-recommended
+tilt up
+minikube stop
+minikube delete
+rm -rf tilt-example-python
+```
+
+## TODO
+{% if repository_provider == "github.com" -%}
+* [Open Issues](https://github.com/{{ repository_namespace }}/{{ repository_name }}/issues)
+{% endif -%}
+* QA [Ansible playbook](ansible/playbook.yml)
+  * Test
+    * macOS
+    * Ubuntu
+* Write boilerplate pytest tests
+* CI/CD
+
+## Further Reading
+* [python](https://www.python.org/)
+* [asdf](https://asdf-vm.com/guide/getting-started.html#_2-download-asdf)
+{% if use_taskfile -%}
+* [task](https://taskfile.dev/#/)
+{% endif -%}
+{% if use_docker -%}
+* [docker-compose](https://docs.docker.com/compose/install/)
+{% endif -%}
+* [pre-commit hooks](https://pre-commit.com/)
