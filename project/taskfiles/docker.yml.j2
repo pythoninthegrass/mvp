@@ -1,0 +1,117 @@
+version: "3.0"
+
+set: ['e', 'u', 'pipefail']
+shopt: ['globstar']
+
+env:
+  BUILD: "{{"{{"}}".TLD"{{"}}"}}/bin/build.sh"
+  COMPOSE_FILE: "{{"{{"}}".TLD"{{"}}"}}/docker-compose.yml"
+  DOCKERFILE: "{{"{{"}}".TLD"{{"}}"}}/Dockerfile"
+  PLATFORM:
+    sh: "echo ${PLATFORM:-linux/arm64/v8}"
+  REGISTRY:
+    sh: "echo ${REGISTRY:-ghcr.io}"
+  USER_NAME:
+    sh: "echo ${USER_NAME:-{{ repository_namespace }}}"
+  SERVICE: "{{ python_package_distribution_name }}"
+  VERSION:
+    sh: "echo ${VERSION:-latest}"
+
+tasks:
+  net:
+    desc: "Create docker network"
+    cmds:
+      - |
+        docker network create \
+          --driver bridge \
+          app-tier
+    status:
+      - |
+        docker network ls --format \{\{.Name\}\} \
+          | grep -q '^app-tier$'
+
+  vol:
+    desc: "Create docker volume"
+    cmds:
+      - |
+        docker volume create \
+          --driver local \
+          {{"{{"}}".SERVICE"{{"}}"}}-vol
+    status:
+      - |
+        docker volume ls --format \{\{.Name\}\} \
+          | grep -q '^{{"{{"}}".SERVICE"{{"}}"}}-vol$'
+
+  build:
+    desc: "Build the docker image"
+    summary: |
+      Build the docker image with the specified dockerfile.
+
+      The default dockerfile is `Dockerfile`.
+
+      USAGE
+        task docker:build
+    cmds:
+      - |
+        docker build \
+          -f {{"{{"}}".DOCKERFILE"{{"}}"}}" \
+          -t {{"{{"}}".SERVICE"{{"}}"}}" \
+          --platform {{"{{"}}".ARCH"{{"}}"}}" \
+          .
+
+  login:
+    desc: "Login to the container registry"
+    cmds:
+      - |
+        echo "{{"{{"}}".REGISTRY_PASS"{{"}}"}}" | docker login \
+          -u {{"{{"}}".USER_NAME"{{"}}"}}" \
+          --password-stdin {{"{{"}}".REGISTRY_URL"{{"}}"}}"
+    run: once
+    silent: true
+    status:
+      - |
+        jq -e '.auths | keys[] | select(contains("{{"{{"}}".REGISTRY_URL"{{"}}"}}"))' ~/.docker/config.json
+
+  push:
+    desc: "Push the docker image to the registry"
+    deps:
+      - login
+      - build
+    cmds:
+      - docker push {{"{{"}}".REGISTRY_URL"{{"}}"}}/{{"{{"}}".USER_NAME"{{"}}"}}/{{"{{"}}".SERVICE"{{"}}"}}"
+
+  up:
+    desc: "Start the project with docker compose"
+    cmds:
+      - |
+        docker compose -f {{"{{"}}".COMPOSE_FILE"{{"}}"}}" up -d \
+        --build \
+        --remove-orphans
+
+  exec:
+    desc: "Shell into a running container"
+    cmds:
+      - docker exec -it {{"{{"}}".SERVICE"{{"}}"}}" sh
+
+  logs:
+    desc: "Follow the logs of a running container"
+    cmds:
+      - docker compose logs -tf {{"{{"}}".SERVICE"{{"}}"}}"
+
+  stop:
+    desc: "Stop the project with docker compose"
+    cmds:
+      - docker compose -f {{"{{"}}".COMPOSE_FILE"{{"}}"}}" stop
+
+  down:
+    desc: "Stop and remove containers, networks, and volumes with docker compose"
+    cmds:
+      - |
+        docker compose -f {{"{{"}}".COMPOSE_FILE"{{"}}"}}" down \
+        --volumes
+
+  prune:
+    desc: "Prune docker"
+    cmds:
+      - docker system prune --all --force
+      - docker builder prune --all --force
