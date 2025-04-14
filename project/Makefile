@@ -52,7 +52,7 @@ endef
 
 # targets
 .PHONY: all
-all: help asdf xcode brew jq pre-commit sccache task yq ## run all targets
+all: help asdf xcode brew copier jq pre-commit sccache task yq ## run all targets
 
 xcode: ## install xcode command line tools
 ifeq ($(UNAME), Darwin)
@@ -106,6 +106,9 @@ asdf: xcode ## install asdf
 		echo "asdf already installed."; \
 	fi
 
+copier: brew ## install copier
+	$(call brew_install,copier)
+
 jq: brew ## install jq
 	$(call brew_install,jq)
 
@@ -121,7 +124,7 @@ task: brew ## install taskfile
 yq: brew ## install yq
 	$(call brew_install,yq)
 
-install: xcode asdf brew jq pre-commit sccache task yq ## install dependencies
+install: xcode asdf brew copier jq pre-commit sccache task yq ## install dependencies
 
 help: ## show this help
 	@echo ''

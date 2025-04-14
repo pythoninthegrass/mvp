@@ -56,35 +56,43 @@ devbox run test
 ### Taskfile
 ```bash
 λ task
+task: [default] task --list
 task: Available tasks for this project:
-* checkbash:                Check bash scripts
-* default:                  Default task
-* format:                   Run formatters
-* install:                  Install project dependencies
-* install-devbox:           Install devbox
-* lint:                     Run linters
-* pre-commit:               Run pre-commit hooks
-* pyclean:                  Remove .pyc and __pycache__
-* test:                     Run tests
-* docker:build:             Build the docker image                                                     (aliases: docker:build)
-* docker:down:              Stop and remove containers, networks, and volumes with docker compose      (aliases: docker:down)
-* docker:exec:              Shell into a running container                                             (aliases: docker:exec)
-* docker:login:             Login to the container registry                                            (aliases: docker:login)
-* docker:logs:              Follow the logs of a running container                                     (aliases: docker:logs)
-* docker:net:               Create docker network                                                      (aliases: docker:net)
-* docker:prune:             Prune docker                                                               (aliases: docker:prune)
-* docker:push:              Push the docker image to the registry                                      (aliases: docker:push)
-* docker:stop:              Stop the project with docker compose                                       (aliases: docker:stop)
-* docker:up:                Start the project with docker compose                                      (aliases: docker:up)
-* docker:vol:               Create docker volume                                                       (aliases: docker:vol)
-* poetry:add-pypi:          Add test-pypi repository                                                   (aliases: poetry:add-pypi)
-* poetry:build:             Build the poetry bin                                                       (aliases: poetry:build)
-* poetry:bump-semver:       Bump the project semantic version                                          (aliases: poetry:bump-semver)
-* poetry:default:           Default task                                                               (aliases: poetry:default, poetry, poetry)
-* poetry:export-reqs:       Export requirements.txt                                                    (aliases: poetry:export-reqs)
-* poetry:install:           Install project dependencies                                               (aliases: poetry:install)
-* poetry:publish:           Publish the poetry bin                                                     (aliases: poetry:publish)
-* poetry:update-deps:       Update dependencies                                                        (aliases: poetry:update-deps)
+* default:               Default task
+* format:                Run formatters
+* install:               Install project dependencies
+* install-devbox:        Install devbox
+* lint:                  Run linters
+* pre-commit:            Run pre-commit hooks
+* pyclean:               Remove .pyc and __pycache__
+* test:                  Run tests
+* docker:build:          Build the docker image
+* docker:down:           Stop and remove containers, networks, and volumes with docker compose
+* docker:exec:           Shell into a running container
+* docker:login:          Login to the container registry
+* docker:logs:           Follow the logs of a running container
+* docker:net:            Create docker network
+* docker:prune:          Prune docker
+* docker:push:           Push the docker image to the registry
+* docker:stop:           Stop the project with docker compose
+* docker:up:             Start the project with docker compose
+* docker:vol:            Create docker volume
+* orbstack:create:       Create an orbstack VM        (aliases: orb:create)
+* orbstack:delete:       Delete an orbstack VM        (aliases: orb:delete)
+* orbstack:exec:         SSH into an orbstack VM      (aliases: orb:exec)
+* orbstack:list:         List orbstack VMs            (aliases: orb:list)
+* orbstack:start:        Start an orbstack VM         (aliases: orb:start)
+* orbstack:stop:         Stop an orbstack VM          (aliases: orb:stop)
+* orbstack:update:       Update orbstack app          (aliases: orb:update)
+* redis:start:           Start Redis server
+* redis:stop:            Stop Redis server
+* uv:export-reqs:        Export requirements.txt
+* uv:install:            Install project dependencies
+* uv:install-uv:         Install uv
+* uv:lock:               Update the project's lockfile.
+* uv:sync:               Sync dependencies with lockfile
+* uv:update-deps:        Update dependencies
+* uv:venv:               Create a virtual environment                                                    
 ```
 
 ### Tilt
