@@ -4,6 +4,7 @@
   "github_username": "pythoninthegrass",
   "project_name": "Minimum Viable Python",
   "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
+  "python_package_import_name": "{{ cookiecutter.project_slug }}",
   "project_short_description": "mvp contains all the boilerplate you need to create a Python repo.",
   "pypi_username": "{{ cookiecutter.github_username }}",
   "version": "0.1.0",
