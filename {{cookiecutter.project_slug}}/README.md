@@ -16,9 +16,9 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
   * [Development](#development)
     * [Devbox](#devbox)
     * [Taskfile](#taskfile)
-{% if cookiecutter.command_line_interface != "No command-line interface" %}
+{%- if cookiecutter.command_line_interface != "No command-line interface" %}
     * [CLI Usage](#cli-usage)
-{% endif %}
+{%- endif %}
   * [TODO](#todo)
   * [Further Reading](#further-reading)
 
@@ -77,7 +77,7 @@ task: Available tasks for this project:
 * test:                     Run tests
 ```
 
-{% if cookiecutter.command_line_interface != "No command-line interface" %}
+{% if cookiecutter.command_line_interface != "No command-line interface" -%}
 ### CLI Usage
 
 After installation, you can use the `{{ cookiecutter.project_slug }}` command:
@@ -89,7 +89,7 @@ After installation, you can use the `{{ cookiecutter.project_slug }}` command:
 # Run the main command
 {{ cookiecutter.project_slug }} run
 ```
-{% endif %}
+{%- endif %}
 
 ## TODO
 
