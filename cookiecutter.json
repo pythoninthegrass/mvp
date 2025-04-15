@@ -18,7 +18,7 @@
   "_copy_without_render": [
     "*.html",
     "ansible/*",
-    ".github/*",
+    ".github/workflows/*.yml",
     "taskfile.yml",
     "taskfiles/*.yml"
   ],
