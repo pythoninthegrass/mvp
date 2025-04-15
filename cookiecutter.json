@@ -21,5 +21,6 @@
     ".github/*",
     "taskfile.yml",
     "taskfiles/*.yml"
-  ]
+  ],
+  "_new_lines": "\n"
 }
