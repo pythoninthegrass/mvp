@@ -16,6 +16,7 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
     * [Minimum requirements](#minimum-requirements)
     * [Recommended requirements](#recommended-requirements)
   * [Development](#development)
+    * [Cookiecutter](#cookiecutter)
     * [Devbox](#devbox)
     * [Taskfile](#taskfile)
     * [Tilt](#tilt)
@@ -30,10 +31,42 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
 
 ### Recommended requirements
 
+* [asdf](https://asdf-vm.com/guide/getting-started.html)
 * [devbox](https://www.jetpack.io/devbox/docs/quickstart/)
 * [task](https://taskfile.dev/#/installation)
 
 ## Development
+
+### Cookiecutter
+
+* [Install cookiecutter](https://cookiecutter.readthedocs.io/en/stable/README.html#installation)
+
+    ```bash
+    # asdf (my vote)
+    asdf plugin add cookiecutter
+    asdf install cookiecutter latest
+    asdf set -u cookiecutter latest
+
+    # pipx
+    pipx install cookiecutter
+
+    # python user directory
+    python -m pip install --user cookiecutter
+    ```
+
+* Use cookiecutter to create a new project
+
+    ```bash
+    # interactive
+    cookiecutter gh:pythoninthegrass/mvp
+
+    # non-interactive
+    cookiecutter gh:pythoninthegrass/mvp
+
+    # local debugging
+    cd /tmp
+    cookiecutter ~/git/mvp --no-input -f
+    ```
 
 ### Devbox
 
