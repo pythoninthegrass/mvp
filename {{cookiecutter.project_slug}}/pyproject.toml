@@ -79,7 +79,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["{{ python_package_import_name }}"]
+source = ["{{ cookiecutter.python_package_import_name }}"]
 omit = [
     "*/tests/*",
     "*/migrations/*",

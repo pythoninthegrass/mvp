@@ -14,5 +14,12 @@
   "command_line_interface": ["Typer", "Argparse", "No command-line interface"],
   "create_author_file": "n",
   "open_source_license": ["MIT license", "Apache Software License 2.0", "GNU General Public License v3", "GNU Affero General Public License v3", "Mozilla Public License 2.0", "Creative Commons Attribution 4.0", "Creative Commons Zero v1.0 Universal", "Unlicense", "WTFPL", "Not open source"],
-  "__gh_slug": "{{ cookiecutter.github_username }}/{{ cookiecutter.project_slug }}"
+  "__gh_slug": "{{ cookiecutter.github_username }}/{{ cookiecutter.project_slug }}",
+  "_copy_without_render": [
+    "*.html",
+    "ansible/*",
+    ".github/*",
+    "taskfile.yml",
+    "taskfiles/*.yml"
+  ]
 }
