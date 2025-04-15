@@ -35,10 +35,10 @@ test = [
     "pytest-xdist<4.0.0,>=3.6.1",
 ]
 
-{% if cookiecutter.command_line_interface != "No command-line interface" %}
+{% if cookiecutter.command_line_interface != "No command-line interface" -%}
 [project.scripts]
 {{ cookiecutter.project_slug }} = "{{ cookiecutter.project_slug }}.cli:main"
-{% endif %}
+{%- endif %}
 
 [tool.deptry]
 # DEP003: transitive deps
