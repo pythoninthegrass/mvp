@@ -1,11 +1,11 @@
 [project]
-name = "{{ python_package_distribution_name }}"
-version = "0.1.0"
-description = "{{ project_description }}"
+name = "{{ cookiecutter.project_slug }}"
+version = "{{ cookiecutter.version }}"
+description = "{{ cookiecutter.project_short_description }}"
 authors = [
-    {name = "{{ author_fullname }}", email = "{{ author_email }}"}
+    {name = "{{ cookiecutter.github_username }}", email = "{{ cookiecutter.email }}"}
 ]
-license = "{{ copyright_license }}"
+license = "{{ cookiecutter.open_source_license }}"
 
 requires-python = ">=3.11,<3.13"
 
@@ -35,9 +35,9 @@ test = [
     "pytest-xdist<4.0.0,>=3.6.1",
 ]
 
-{% if python_package_command_line_name %}
+{% if cookiecutter.command_line_interface != "No command-line interface" %}
 [project.scripts]
-{{ python_package_command_line_name }} = "{{ python_package_import_name }}.cli:main"
+{{ cookiecutter.project_slug }} = "{{ cookiecutter.project_slug }}.cli:main"
 {% endif %}
 
 [tool.deptry]

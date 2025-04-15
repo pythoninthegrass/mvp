@@ -1,6 +1,6 @@
-# {{ project_name }}
+# {{ cookiecutter.project_name }}
 
-{{ project_description }}
+{{ cookiecutter.project_short_description }}
 
 ## Summary
 
@@ -8,7 +8,7 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
 
 **Table of Contents**
 
-* [{{ project_name }}](#{{ project_name | slugify }})
+* [{{ cookiecutter.project_name }}](#{{ cookiecutter.project_name | slugify }})
   * [Summary](#summary)
   * [Setup](#setup)
     * [Minimum requirements](#minimum-requirements)
@@ -16,7 +16,7 @@ Sets up a new development environment for a Mac or Linux (i.e., UNIX) box.
   * [Development](#development)
     * [Devbox](#devbox)
     * [Taskfile](#taskfile)
-{% if python_package_command_line_name %}
+{% if cookiecutter.command_line_interface != "No command-line interface" %}
     * [CLI Usage](#cli-usage)
 {% endif %}
   * [TODO](#todo)
@@ -77,23 +77,23 @@ task: Available tasks for this project:
 * test:                     Run tests
 ```
 
-{% if python_package_command_line_name %}
+{% if cookiecutter.command_line_interface != "No command-line interface" %}
 ### CLI Usage
 
-After installation, you can use the `{{ python_package_command_line_name }}` command:
+After installation, you can use the `{{ cookiecutter.project_slug }}` command:
 
 ```bash
 # Show help
-{{ python_package_command_line_name }} --help
+{{ cookiecutter.project_slug }} --help
 
 # Run the main command
-{{ python_package_command_line_name }} run
+{{ cookiecutter.project_slug }} run
 ```
 {% endif %}
 
 ## TODO
 
-* [Open Issues](https://{{ repository_provider }}/{{ repository_namespace }}/{{ repository_name }}/issues)
+* [Open Issues](https://github.com/{{ cookiecutter.github_username }}/{{ cookiecutter.project_slug }}/issues)
 * QA [Ansible playbook](ansible/playbook.yml)
   * Test
     * macOS
