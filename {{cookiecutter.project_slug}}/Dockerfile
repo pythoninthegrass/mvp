@@ -1,54 +1,77 @@
-# syntax=docker/dockerfile:1.7.0
+# syntax=docker/dockerfile:1.7.1
 
-# full semver just for python base image
-ARG PYTHON_VERSION=3.11.11
+ARG PYTHON_VERSION=3.12.10
 
-FROM python:${PYTHON_VERSION}-slim-bullseye AS builder
+FROM python:${PYTHON_VERSION}-slim-bookworm as builder
 
-# avoid stuck build due to user prompt
 ARG DEBIAN_FRONTEND=noninteractive
 
-# update apt-get repos and install dependencies
-RUN apt-get -qq update \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get -qq update \
     && apt-get -qq install --no-install-recommends -y \
+    build-essential \
+    ca-certificates \
     curl \
     gcc \
-    libpq-dev \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# pip env vars
-ENV PIP_NO_CACHE_DIR=off
-ENV PIP_DISABLE_PIP_VERSION_CHECK=on
-ENV PIP_DEFAULT_TIMEOUT=100
+# venv
+ARG UV_PROJECT_ENVIRONMENT="/opt/venv"
+ENV VENV="${UV_PROJECT_ENVIRONMENT}"
+ENV PATH="$VENV/bin:$PATH"
 
-# poetry env vars
-ENV POETRY_HOME="/opt/poetry"
-ENV POETRY_VERSION=1.8.5
-ENV POETRY_VIRTUALENVS_IN_PROJECT=true
-ENV POETRY_NO_INTERACTION=1
+# uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# path
-ENV VENV="/opt/venv"
-ENV PATH="$POETRY_HOME/bin:$VENV/bin:$PATH"
+ARG WORKDIR="/app"
+WORKDIR $WORKDIR
 
-# create app directory and set as working directory
-WORKDIR /app
+COPY pyproject.toml .
 
-# copy dependencies
-COPY requirements.txt requirements.txt
+# optimize startup time, don't use hardlinks, set cache for buildkit mount,
+# set uv timeout
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+ENV UV_CACHE_DIR=/opt/uv-cache/
+ENV UV_HTTP_TIMEOUT=90
 
-# install poetry and dependencies
-RUN python -m venv $VENV \
-    && . "${VENV}/bin/activate" \
-    && python -m pip install "poetry==${POETRY_VERSION}" \
-    && python -m pip install -r requirements.txt
+RUN --mount=type=cache,target=/opt/uv-cache,sharing=locked \
+    uv venv $UV_PROJECT_ENVIRONMENT \
+    && uv pip install -r pyproject.toml
 
-FROM python:${PYTHON_VERSION}-slim-bullseye AS dev
+FROM python:${PYTHON_VERSION}-slim-bookworm as deps
 
-# setup path
-ENV VENV="/opt/venv"
-ENV PATH="${VENV}/bin:${VENV}/lib/python${PYTHON_VERSION}/site-packages:/usr/local/bin:${HOME}/.local/bin:/bin:/usr/bin:/usr/share/doc:$PATH"
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get -qq update \
+    && apt-get -qq install --no-install-recommends -y \
+        libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+FROM deps as runner
+
+ARG WORKDIR="/app"
+WORKDIR $WORKDIR
+
+ARG USER_NAME=appuser
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+RUN groupadd --gid $USER_GID $USER_NAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USER_NAME \
+    && chown -R $USER_NAME:$USER_NAME /app
+
+ARG VENV="/opt/venv"
+ENV PATH=$VENV/bin:$HOME/.local/bin:$PATH
+
+COPY --from=builder \
+    --chown=$USER_NAME:$USER_NAME "$VENV" "$VENV"
+
+COPY --chown=$USER_NAME:$USER_NAME ./app/ ${WORKDIR}/
 
 # standardise on locale, don't generate .pyc, enable tracebacks on seg faults
 ENV LANG C.UTF-8
@@ -56,98 +79,10 @@ ENV LC_ALL C.UTF-8
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONFAULTHANDLER 1
 
-# workers per core
-# https://github.com/tiangolo/uvicorn-gunicorn-fastapi-docker/blob/master/README.md#web_concurrency
-ENV WEB_CONCURRENCY=2
-
-# avoid stuck build due to user prompt
-ARG DEBIAN_FRONTEND=noninteractive
-
-# install dependencies
-RUN apt-get -qq update \
-    && apt-get -qq install --no-install-recommends -y \
-    bat \
-    curl \
-    dpkg \
-    git \
-    iputils-ping \
-    lsof \
-    make \
-    p7zip \
-    perl \
-    shellcheck \
-    sudo \
-    tldr \
-    tree \
-    && rm -rf /var/lib/apt/lists/*
-
-# setup standard non-root user for use downstream
-ARG USER_NAME=appuser
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
-
-RUN groupadd --gid $USER_GID $USER_NAME \
-    && useradd --uid $USER_UID --gid $USER_GID -m $USER_NAME
-
-RUN echo "$USER_NAME ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER_NAME \
-    && chmod 0440 /etc/sudoers.d/$USER_NAME
-
-# copy virtual environment from builder stage
-COPY --from=builder --chown=${USER_NAME}:${USER_GROUP} $VENV $VENV
-
-# qol: tooling
-RUN <<EOF
-#!/usr/bin/env bash
-# fzf
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-yes | ~/.fzf/install
-EOF
-
-# switch to non-root user
 USER $USER_NAME
 
-# qol: .bashrc
-RUN tee -a "$HOME/.bashrc" <<"EOF"
-
-# shared history
-HISTFILE=/var/tmp/.bash_history
-HISTFILESIZE=100
-HISTSIZE=100
-
-stty -ixon
-
-# fzf
-[ -f ~/.fzf.bash ] && . ~/.fzf.bash
-
-# asdf
-# https://asdf-vm.com/guide/getting-started.html
-export ASDF_DIR="$HOME/.asdf"
-[[ -f "${ASDF_DIR}/asdf.sh" ]] && . "${ASDF_DIR}/asdf.sh"
-
-# homebrew
-export BREW_PREFIX="/home/linuxbrew/.linuxbrew/bin"
-[[ -f "${BREW_PREFIX}/brew" ]] && eval "$(${BREW_PREFIX}/brew shellenv)"
-
-# aliases
-alias ..='cd ../'
-alias ...='cd ../../'
-alias ll='ls -la --color=auto'
-
-EOF
-
-FROM dev AS runner
-
-# change working directory
-WORKDIR /app
-
-# $PATH
-ENV PATH=$VENV_PATH/bin:$HOME/.local/bin:$PATH
-
-# port needed by app
 EXPOSE 8000
 
-# run container indefinitely
 CMD ["sleep", "infinity"]
-
-# metadata
-LABEL org.opencontainers.image.title="python-class"
+# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
