@@ -115,3 +115,73 @@ tasks:
     cmds:
       - docker system prune --all --force
       - docker builder prune --all --force
+
+  create-builder:
+    desc: "Create a local docker buildx builder"
+    cmds:
+      - |
+        docker buildx create \
+          --name multi-platform \
+          --node multi-platform \
+          --platform linux/arm64/v8,linux/amd64 \
+          --driver=docker-container \
+          --use \
+          --bootstrap
+    status:
+      - docker buildx inspect multi-platform > /dev/null 2>&1
+
+  validate:
+    desc: Validate the docker-bake.hcl file
+    vars:
+      BAKE_OUTPUT:
+        sh: docker buildx bake --file docker-bake.hcl --print 2>&1 || true
+      VALIDATION_ERROR:
+        sh: echo "{{.BAKE_OUTPUT}}" | grep -q "ERROR:" && echo "true" || echo "false"
+    preconditions:
+      - sh: "test {{.VALIDATION_ERROR}} = false"
+        msg: |
+          Docker bake file is invalid. Error details:
+          {{.BAKE_OUTPUT}}
+    cmds:
+      - cmd: echo "Docker bake file is valid"
+        silent: true
+
+  buildx:
+    desc: "Build using docker buildx bake"
+    summary: |
+      Build using docker buildx bake with the specified target.
+
+      AVAILABLE TARGETS
+        - build (default): Builds the main image
+        - amd64: Builds specifically for AMD64 platform
+        - arm64: Builds specifically for ARM64 platform
+        - multi-platform: Builds for both AMD64 and ARM64 platforms
+
+      USAGE
+        task docker:buildx
+        task docker:buildx -- amd64
+        task docker:buildx -- arm64
+        task docker:buildx -- multi-platform
+    deps:
+      - validate
+      - create-builder
+    cmds:
+      - |
+        if [ -z "{{.CLI_ARGS}}" ]; then
+          TARGET="build"
+        else
+          case "{{.CLI_ARGS}}" in
+            build|amd64|arm64|multi-platform)
+              TARGET="{{.CLI_ARGS}}"
+              ;;
+            *)
+              echo "Error: Invalid target '{{.CLI_ARGS}}'"
+              echo "Valid targets are: build, amd64, arm64, multi-platform"
+              exit 1
+              ;;
+          esac
+        fi
+
+        docker buildx bake \
+          --file docker-bake.hcl \
+          $TARGET
