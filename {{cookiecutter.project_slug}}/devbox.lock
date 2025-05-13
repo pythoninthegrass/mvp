@@ -49,70 +49,6 @@
         }
       }
     },
-    "copier@latest": {
-      "last_modified": "2025-03-11T17:52:14Z",
-      "resolved": "github:NixOS/nixpkgs/0d534853a55b5d02a4ababa1d71921ce8f0aee4c#copier",
-      "source": "devbox-search",
-      "version": "9.4.1",
-      "systems": {
-        "aarch64-darwin": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/vw0zkyj6qkkjqabs1xdbi64pyszldqbq-copier-9.4.1",
-              "default": true
-            },
-            {
-              "name": "dist",
-              "path": "/nix/store/799xclqhg7lsjqxnfcjxcl449b6ykm4d-copier-9.4.1-dist"
-            }
-          ],
-          "store_path": "/nix/store/vw0zkyj6qkkjqabs1xdbi64pyszldqbq-copier-9.4.1"
-        },
-        "aarch64-linux": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/nr0vdhfraycc0h0ladch1zwlvxccxii4-copier-9.4.1",
-              "default": true
-            },
-            {
-              "name": "dist",
-              "path": "/nix/store/qj8l888j0gd5avirmap9ljdprzmfbbn9-copier-9.4.1-dist"
-            }
-          ],
-          "store_path": "/nix/store/nr0vdhfraycc0h0ladch1zwlvxccxii4-copier-9.4.1"
-        },
-        "x86_64-darwin": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/gg1bs538dhaqpvx0v9x8vqyv3h060p7f-copier-9.4.1",
-              "default": true
-            },
-            {
-              "name": "dist",
-              "path": "/nix/store/11191vribq81i0yx0c6vdia5z84hr7mm-copier-9.4.1-dist"
-            }
-          ],
-          "store_path": "/nix/store/gg1bs538dhaqpvx0v9x8vqyv3h060p7f-copier-9.4.1"
-        },
-        "x86_64-linux": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/c7985qvvc8bh5wvizw4qiwjlsznacvkv-copier-9.4.1",
-              "default": true
-            },
-            {
-              "name": "dist",
-              "path": "/nix/store/sm80bsyrvlibvbvxdjj9p6kac1kz28n4-copier-9.4.1-dist"
-            }
-          ],
-          "store_path": "/nix/store/c7985qvvc8bh5wvizw4qiwjlsznacvkv-copier-9.4.1"
-        }
-      }
-    },
     "gh@latest": {
       "last_modified": "2025-03-20T07:39:01Z",
       "resolved": "github:NixOS/nixpkgs/7344a3b78128f7b1765dba89060b015fb75431a7#gh",
@@ -232,6 +168,10 @@
           "store_path": "/nix/store/lqx2rv26sdndpa2vyy2vxsahj03km69z-git-2.48.1"
         }
       }
+    },
+    "github:NixOS/nixpkgs/nixpkgs-unstable": {
+      "last_modified": "2025-05-12T14:38:58Z",
+      "resolved": "github:NixOS/nixpkgs/eaeed9530c76ce5f1d2d8232e08bec5e26f18ec1?lastModified=1747060738&narHash=sha256-ByfPRQuqj%2BnhtVV0koinEpmJw0KLzNbgcgi9EF%2BNVow%3D"
     },
     "glib@latest": {
       "last_modified": "2025-03-27T11:50:31Z",
