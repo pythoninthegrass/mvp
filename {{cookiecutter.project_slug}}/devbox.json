@@ -1,6 +1,5 @@
 {
   "packages": {
-    "asdf-vm": "latest",
     "gh":      "latest",
     "git":     "latest",
     "glib":    "latest",
@@ -14,6 +13,7 @@
     "gnumake":    "latest",
     "go-task":    "latest",
     "kubectl":    "latest",
+    "mise":       "latest",
     "nodejs_23":  "latest",
     "openssl":    "latest",
     "pre-commit": "latest",
