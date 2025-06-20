@@ -13,6 +13,6 @@
   },
   // Fenced code blocks should be surrounded by blank lines
   "MD031": false,
-  // Empahsis as heading (e.g., table of contents)
+  // Emphasis as heading (e.g., table of contents)
   "MD036": false
 }
