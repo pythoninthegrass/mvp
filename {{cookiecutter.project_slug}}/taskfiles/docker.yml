@@ -182,4 +182,5 @@ tasks:
 
         docker buildx bake \
           --file docker-bake.hcl \
-          $TARGET
+          $TARGET \
+          --load
