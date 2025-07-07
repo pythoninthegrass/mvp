@@ -38,7 +38,7 @@
     ],
     "scripts": {
       "install":     "uv pip install -r pyproject.toml --all-extras",
-      "export-reqs": "uv pip freeze | uv pip compile - -o requirements.txt",
+      "export-reqs": "uv pip freeze > requirements.txt",
       "venv":        "uv venv ${VENV_DIR}",
       "test":        "pytest"
     }
