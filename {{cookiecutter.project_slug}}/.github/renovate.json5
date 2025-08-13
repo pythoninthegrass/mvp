@@ -7,7 +7,7 @@
   },
   "packageRules": [
     {
-      "matchManagers": ["pip_requirements"],
+      "matchManagers": ["pep621"],
       "enabled": true
     }
   ],
