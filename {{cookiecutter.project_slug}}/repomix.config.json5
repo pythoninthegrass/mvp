@@ -29,9 +29,10 @@
     "customPatterns": [
       ".claude",
       ".editorconfig",
+      ".gitignore",
       ".markdownlint.jsonc",
       ".vscode",
-      "**/_index.json",
+      "CLAUDE.md",
       "LICENSE",
       "repomix.config.json5",
       "requirements.txt",
