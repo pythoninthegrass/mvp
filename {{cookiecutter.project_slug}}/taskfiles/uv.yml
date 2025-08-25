@@ -25,7 +25,7 @@ tasks:
   install:
     desc: "Install project dependencies"
     cmds:
-      - uv pip install -r pyproject.toml
+      - uv pip install -r pyproject.toml --all-extras
     dir: "{{.ROOT_DIR}}"
 
   lock:
@@ -60,5 +60,5 @@ tasks:
     summary: |
       Export the project dependencies to a requirements.txt file.
     cmds:
-      - uv pip compile pyproject.toml -o {{.ROOT_DIR}}/requirements.txt
+      - uv pip freeze > {{.ROOT_DIR}}/requirements.txt
     ignore_error: true
