@@ -1,6 +1,7 @@
-# syntax=docker/dockerfile:1.7.1
+# syntax=docker/dockerfile:1.17.1
+# check=skip=all
 
-ARG PYTHON_VERSION=3.12.10
+ARG PYTHON_VERSION=3.13.6
 
 FROM python:${PYTHON_VERSION}-slim-bookworm as builder
 
