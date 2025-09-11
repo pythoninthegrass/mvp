@@ -27,7 +27,7 @@ target "build" {
   // Platform will be set from GitHub Actions
   // cache-from and cache-to will also be set from GitHub Actions
   args = {
-    PYTHON_VERSION = "3.12.10"
+    PYTHON_VERSION = "3.12.11"
     // Additional build args can be defined here
   }
   // Output image will be pushed if push=true is set in GitHub Actions
