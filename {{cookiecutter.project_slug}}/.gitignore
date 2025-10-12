@@ -2,6 +2,7 @@
 *.sqlite
 *.pem
 **/facts/
+.pyscn/
 .ruff*
 tilt-example-python/
 
