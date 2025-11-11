@@ -150,16 +150,20 @@ tasks:
       Build using docker buildx bake with the specified target.
 
       AVAILABLE TARGETS
-        - build (default): Builds the main image
-        - amd64: Builds specifically for AMD64 platform
-        - arm64: Builds specifically for ARM64 platform
-        - multi-platform: Builds for both AMD64 and ARM64 platforms
+        - build (default): Builds the main image and loads to Docker
+        - amd64: Builds specifically for AMD64 platform and loads to Docker
+        - arm64: Builds specifically for ARM64 platform and loads to Docker
+        - multi-platform: Builds for both AMD64 and ARM64 platforms (cached only, not loaded)
 
       USAGE
         task docker:buildx
         task docker:buildx -- amd64
         task docker:buildx -- arm64
         task docker:buildx -- multi-platform
+
+      NOTES
+        - Single-platform builds (build, amd64, arm64) are loaded into local Docker
+        - Multi-platform builds are cached but not loaded (use docker:push to publish)
     deps:
       - validate
       - create-builder
@@ -180,7 +184,15 @@ tasks:
           esac
         fi
 
-        docker buildx bake \
-          --file docker-bake.hcl \
-          $TARGET \
-          --load
+        # Multi-platform builds cannot be loaded into Docker
+        # They must be pushed to a registry or kept in cache
+        if [ "$TARGET" = "multi-platform" ]; then
+          docker buildx bake \
+            --file docker-bake.hcl \
+            $TARGET
+        else
+          docker buildx bake \
+            --file docker-bake.hcl \
+            $TARGET \
+            --load
+        fi
