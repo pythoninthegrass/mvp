@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/pythoninthegrass/mvp/compare/v1.1.0...v1.2.0) (2025-02-27)
+
+
+### Features
+
+* process-compose ([bc5ef0a](https://github.com/pythoninthegrass/mvp/commit/bc5ef0a3faeb4bbfe43653c731f4f442e440efff))
+
+
+### Bug Fixes
+
+* add nontinteractive env var to brew install ([ada1c6d](https://github.com/pythoninthegrass/mvp/commit/ada1c6d062193f8002e30dba6ba9d1f1e7c89c98))
+
 ## [1.1.0](https://github.com/pythoninthegrass/mvp/compare/v1.0.0...v1.1.0) (2024-10-16)
 
 
